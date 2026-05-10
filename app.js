@@ -1,246 +1,111 @@
-// ===== INITIAL DATA =====
-const INITIAL_ANIMES = [
-  { id:'a1', title:'Black Clover', type:'anime', seasons:[
-    {name:'s1', eps:170, watched:170, epDur:20},
-    {name:'SP', eps:1, watched:1, epDur:20},
-    {name:'Film', eps:1, watched:1, epDur:110}
-  ]},
-  { id:'a2', title:'Sword Art Online', type:'anime', seasons:[
-    {name:'s1', eps:25, watched:25, epDur:20},
-    {name:'s2', eps:24, watched:24, epDur:20},
-    {name:'GGO s1', eps:12, watched:12, epDur:20},
-    {name:'GGO s2', eps:12, watched:0, epDur:20},
-    {name:'s3', eps:24, watched:24, epDur:20},
-    {name:'s4', eps:23, watched:23, epDur:20},
-    {name:'Films', eps:4, watched:4, epDur:110}
-  ]},
-  { id:'a3', title:'Classroom of the Élite', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:20},
-    {name:'s2', eps:13, watched:13, epDur:20}
-  ]},
-  { id:'a4', title:'Great Pretender', type:'anime', seasons:[
-    {name:'s1', eps:23, watched:23, epDur:20},
-    {name:'Film', eps:1, watched:0, epDur:90}
-  ]},
-  { id:'a5', title:'Your Name', type:'anime', seasons:[
-    {name:'Film', eps:1, watched:1, epDur:100}
-  ]},
-  { id:'a6', title:'Le garçon et la bête', type:'anime', seasons:[
-    {name:'Film', eps:1, watched:1, epDur:110}
-  ]},
-  { id:'a7', title:'Fire Force', type:'anime', seasons:[
-    {name:'s1', eps:24, watched:24, epDur:20},
-    {name:'s2', eps:24, watched:24, epDur:20},
-    {name:'s3', eps:25, watched:12, epDur:20}
-  ]},
-  { id:'a8', title:"Jojo's Bizarre Adventure", type:'anime', seasons:[
-    {name:'s1', eps:9, watched:0, epDur:20},
-    {name:'s2', eps:17, watched:0, epDur:20},
-    {name:'s3', eps:48, watched:0, epDur:20},
-    {name:'s4', eps:39, watched:0, epDur:20},
-    {name:'OAV', eps:4, watched:0, epDur:20},
-    {name:'s5', eps:39, watched:0, epDur:20},
-    {name:'s6', eps:38, watched:0, epDur:20}
-  ]},
-  { id:'a9', title:'Shibukui Bisco', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:20}
-  ]},
-  { id:'a10', title:'Cheat Skill Level Up', type:'anime', seasons:[
-    {name:'s1', eps:13, watched:13, epDur:20}
-  ]},
-  { id:'a11', title:'Fairy Tails', type:'anime', seasons:[
-    {name:'Films', eps:2, watched:0, epDur:90}
-  ]},
-  { id:'a12', title:'Level 1 Dakedo Unique Skill', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:20}
-  ]},
-  { id:'a13', title:'Farming Life in Another World', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:20},
-    {name:'s2', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a14', title:'Solo Leveling', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:20},
-    {name:'s2', eps:13, watched:13, epDur:20}
-  ]},
-  { id:'a15', title:'The Rising of the Shield Hero', type:'anime', seasons:[
-    {name:'s1', eps:25, watched:25, epDur:20},
-    {name:'s2', eps:13, watched:13, epDur:20},
-    {name:'s3', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a16', title:'Tales of Demons and Gods', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:12, epDur:25},
-    {name:'s2', eps:12, watched:12, epDur:25},
-    {name:'s3', eps:12, watched:5, epDur:25},
-    {name:'s4', eps:12, watched:0, epDur:25}
-  ]},
-  { id:'a17', title:'Zom 100', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a18', title:'Gate', type:'anime', seasons:[
-    {name:'s1', eps:24, watched:0, epDur:20}
-  ]},
-  { id:'a19', title:'Undead Unluck', type:'anime', seasons:[
-    {name:'s1', eps:24, watched:0, epDur:20}
-  ]},
-  { id:'a20', title:'Frieren', type:'anime', seasons:[
-    {name:'s1', eps:28, watched:0, epDur:20}
-  ]},
-  { id:'a21', title:'Sakamoto Days', type:'anime', seasons:[
-    {name:'s1 p1', eps:11, watched:0, epDur:20},
-    {name:'s1 p2', eps:11, watched:0, epDur:20}
-  ]},
-  { id:'a22', title:'Lord of Mysteries', type:'anime', seasons:[
-    {name:'s1', eps:13, watched:0, epDur:20},
-    {name:'OAV', eps:9, watched:0, epDur:20}
-  ]},
-  { id:'a23', title:'One Punch Man', type:'anime', seasons:[
-    {name:'s1', eps:12, watched:0, epDur:20},
-    {name:'s2', eps:12, watched:0, epDur:20},
-    {name:'s3', eps:5, watched:0, epDur:20},
-    {name:'OAV', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a24', title:'Konosuba', type:'anime', seasons:[
-    {name:'s1', eps:11, watched:11, epDur:20},
-    {name:'s2', eps:11, watched:0, epDur:20},
-    {name:'s3', eps:11, watched:0, epDur:20},
-    {name:'s3 OAV', eps:2, watched:0, epDur:20},
-    {name:'Film', eps:1, watched:0, epDur:90},
-    {name:'Explosion', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a25', title:'The Eminence in Shadow', type:'anime', seasons:[
-    {name:'s1', eps:20, watched:0, epDur:20},
-    {name:'s2', eps:12, watched:0, epDur:20}
-  ]},
-  { id:'a26', title:'Re:Zero', type:'anime', seasons:[
-    {name:'s1', eps:13, watched:13, epDur:45},
-    {name:'s2', eps:25, watched:12, epDur:25},
-    {name:'s3', eps:16, watched:0, epDur:20},
-    {name:'s4', eps:2, watched:0, epDur:20},
-    {name:'Films', eps:2, watched:1, epDur:70}
-  ]},
-  { id:'a27', title:"L'Atelier des Sorciers", type:'anime', seasons:[
-    {name:'s1', eps:6, watched:6, epDur:20}
-  ]},
-  { id:'a28', title:'Tsugai', type:'anime', seasons:[
-    {name:'s1', eps:5, watched:0, epDur:20}
-  ]},
-  { id:'a29', title:'Mushoku Tensei', type:'anime', seasons:[] },
-  { id:'a30', title:'Overlord', type:'anime', seasons:[] },
-  { id:'a31', title:'I Parry Everything', type:'anime', seasons:[] },
-];
+// ===== DATA LOADING =====
+let DB = { animes: [], mangas: [] };
+let dbLoaded = false;
 
-const INITIAL_MANGAS = [
-  { id:'m1', title:'Gloutons et Dragons', type:'manga', total:11, read:11, notes:'' },
-  { id:'m2', title:'Fullmetal Alchemist', type:'manga', total:27, read:27, notes:'' },
-  { id:'m3', title:'Hunter x Hunter', type:'manga', total:37, read:36, notes:'' },
-  { id:'m4', title:'My Hero Academia', type:'manga', total:35, read:35, notes:'' },
-  { id:'m5', title:'Magus of the Library', type:'manga', total:4, read:4, notes:'' },
-  { id:'m6', title:'One Piece', type:'manga', total:101, read:21, notes:'' },
-  { id:'m7', title:'Naruto', type:'manga', total:72, read:33, notes:'' },
-  { id:'m8', title:'Fairy Tail', type:'manga', total:63, read:63, notes:'' },
-  { id:'m9', title:'Eden Zero', type:'manga', total:16, read:16, notes:'' },
-  { id:'m10', title:'Créatures Fantastiques', type:'manga', total:5, read:5, notes:'' },
-  { id:'m11', title:"Félin pour l'autre", type:'manga', total:6, read:6, notes:'' },
-  { id:'m12', title:'Black Clover', type:'manga', total:9, read:9, notes:'Scans lus jusqu\'au chap. 383/389' },
-];
+async function loadDatabase() {
+  try {
+    const response = await fetch('db.json');
+    if (!response.ok) throw new Error('Erreur chargement db.json');
+    DB = await response.json();
+    dbLoaded = true;
+    renderAll();
+  } catch (error) {
+    console.error('Erreur DB:', error);
+    DB = { animes: [], mangas: [] };
+    renderAll();
+  }
+}
 
 // ===== STATE =====
 let currentTab = 'anime';
 let currentFilter = 'all';
 let editingId = null;
 let modalType = 'anime';
-let seasonFields = [];
-
-// GitHub Sync
 let githubToken = null;
 let gistId = null;
-let syncStatus = 'local'; // 'local', 'synced', 'syncing', 'error'
-
-let DB = { animes: [], mangas: [] };
-
-// ===== STORAGE =====
-function loadData() {
-  try {
-    const stored = localStorage.getItem('otakutrack-data');
-    if (stored) return JSON.parse(stored);
-  } catch(e) {}
-  return { animes: INITIAL_ANIMES.map(a => ({...a})), mangas: INITIAL_MANGAS.map(m => ({...m})) };
-}
-
-function saveData(data) {
-  localStorage.setItem('otakutrack-data', JSON.stringify(data));
-  updateSyncStatus();
-}
-
-function loadConfig() {
-  githubToken = localStorage.getItem('otakutrack-token') || null;
-  gistId = localStorage.getItem('otakutrack-gistid') || null;
-  document.getElementById('config-token').value = githubToken ? '••••••••••' : '';
-  updateConfigModal();
-}
-
-function saveConfig(token) {
-  if (token && token.length > 10) {
-    githubToken = token;
-    localStorage.setItem('otakutrack-token', token);
-  }
-  updateConfigModal();
-}
 
 // ===== GITHUB SYNC =====
+function loadConfig() {
+  const stored = localStorage.getItem('otakutrack-config');
+  if (stored) {
+    try {
+      const config = JSON.parse(stored);
+      githubToken = config.token || null;
+      gistId = config.gistId || null;
+      updateSyncIndicator();
+    } catch(e) {}
+  }
+}
+
+function saveConfig() {
+  const config = { token: githubToken, gistId: gistId };
+  localStorage.setItem('otakutrack-config', JSON.stringify(config));
+}
+
+function updateSyncIndicator() {
+  const dot = document.getElementById('sync-dot');
+  const text = document.getElementById('sync-text');
+  if (githubToken) {
+    dot.className = 'sync-dot synced';
+    text.textContent = 'Connecté';
+  } else {
+    dot.className = 'sync-dot';
+    text.textContent = 'Local';
+  }
+}
+
 async function syncToGithub() {
   if (!githubToken) return;
   
-  setSyncStatus('syncing');
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot syncing';
+  
   try {
-    const dataStr = JSON.stringify(DB, null, 2);
-    
     if (!gistId) {
-      // Create new gist
-      const res = await fetch('https://api.github.com/gists', {
+      const response = await fetch('https://api.github.com/gists', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${githubToken}`,
-          'Content-Type': 'application/json'
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify({
-          description: 'OtakuTrack sync',
+          description: 'OtakuTrack Data',
           public: false,
           files: {
-            'otakutrack-data.json': {
-              content: dataStr
+            'otakutrack.json': {
+              content: JSON.stringify(DB, null, 2)
             }
           }
         })
       });
-      if (!res.ok) throw new Error('Gist creation failed');
-      const gist = await res.json();
-      gistId = gist.id;
-      localStorage.setItem('otakutrack-gistid', gistId);
+      
+      if (response.ok) {
+        const data = await response.json();
+        gistId = data.id;
+        saveConfig();
+      }
     } else {
-      // Update existing gist
-      const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      await fetch(`https://api.github.com/gists/${gistId}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${githubToken}`,
-          'Content-Type': 'application/json'
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify({
           files: {
-            'otakutrack-data.json': {
-              content: dataStr
+            'otakutrack.json': {
+              content: JSON.stringify(DB, null, 2)
             }
           }
         })
       });
-      if (!res.ok) throw new Error('Gist update failed');
     }
     
-    setSyncStatus('synced');
+    dot.className = 'sync-dot synced';
     localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
-  } catch (err) {
-    console.error('Sync error:', err);
-    setSyncStatus('error');
+  } catch (error) {
+    console.error('Erreur sync:', error);
+    dot.className = 'sync-dot';
   }
 }
 
@@ -248,50 +113,24 @@ async function syncFromGithub() {
   if (!githubToken || !gistId) return;
   
   try {
-    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
       headers: {
-        'Authorization': `Bearer ${githubToken}`,
+        'Authorization': `token ${githubToken}`,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
-    if (!res.ok) throw new Error('Fetch failed');
-    const gist = await res.json();
-    const dataStr = gist.files['otakutrack-data.json'].content;
-    const remoteData = JSON.parse(dataStr);
-    DB = remoteData;
-    localStorage.setItem('otakutrack-data', JSON.stringify(DB));
-    setSyncStatus('synced');
-    renderAll();
-  } catch (err) {
-    console.error('Pull error:', err);
-  }
-}
-
-function setSyncStatus(status) {
-  syncStatus = status;
-  const dot = document.getElementById('sync-dot');
-  const text = document.getElementById('sync-text');
-  
-  if (status === 'syncing') {
-    dot.classList.remove('synced');
-    dot.classList.add('syncing');
-    text.textContent = 'Sync...';
-  } else if (status === 'synced') {
-    dot.classList.remove('syncing');
-    dot.classList.add('synced');
-    text.textContent = 'Synced';
-  } else if (status === 'error') {
-    dot.classList.remove('synced', 'syncing');
-    text.textContent = 'Erreur';
-  } else {
-    dot.classList.remove('synced', 'syncing');
-    text.textContent = 'Local';
-  }
-}
-
-function updateSyncStatus() {
-  if (githubToken && gistId) {
-    setTimeout(() => syncToGithub(), 500);
+    
+    if (response.ok) {
+      const data = await response.json();
+      const file = data.files['otakutrack.json'];
+      if (file) {
+        DB = JSON.parse(file.content);
+        renderAll();
+        localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+      }
+    }
+  } catch (error) {
+    console.error('Erreur sync:', error);
   }
 }
 
@@ -507,7 +346,7 @@ function quickUpdateManga(id, delta) {
   const m = DB.mangas.find(x => x.id === id);
   if (!m) return;
   m.read = Math.max(0, Math.min(m.total, m.read + delta));
-  saveData(DB);
+  syncToGithub();
   renderAll();
 }
 
@@ -517,21 +356,8 @@ function quickEpisode(animeId, seasonIdx) {
   const se = a.seasons[seasonIdx];
   if (se.watched < se.eps) {
     se.watched++;
-    saveData(DB);
-    const detailEl = document.getElementById('detail-' + animeId);
-    const toggleEl = document.getElementById('toggle-' + animeId);
-    if (detailEl && detailEl.classList.contains('open')) {
-      const wasOpen = true;
-      renderAll();
-      const newDetail = document.getElementById('detail-' + animeId);
-      const newToggle = document.getElementById('toggle-' + animeId);
-      if (newDetail && newToggle) {
-        newDetail.classList.add('open');
-        newToggle.classList.add('open');
-      }
-    } else {
-      renderAll();
-    }
+    syncToGithub();
+    renderAll();
   }
 }
 
@@ -546,11 +372,13 @@ function deleteEntry(id) {
   if (!confirm('Supprimer cette entrée ?')) return;
   DB.animes = DB.animes.filter(x => x.id !== id);
   DB.mangas = DB.mangas.filter(x => x.id !== id);
-  saveData(DB);
+  syncToGithub();
   renderAll();
 }
 
 // ===== MODAL =====
+let seasonFields = [];
+
 function openModal(id = null) {
   editingId = id;
   seasonFields = [];
@@ -653,7 +481,7 @@ function saveEntry() {
       DB.mangas.push({ id: genId(), title, type: 'manga', total, read, notes });
     }
   }
-  saveData(DB);
+  syncToGithub();
   closeModal();
   if (modalType !== currentTab) switchTab(modalType);
   renderAll();
@@ -663,58 +491,47 @@ function editEntry(id) { openModal(id); }
 
 // ===== CONFIG MODAL =====
 function showConfigModal() {
-  updateConfigModal();
   document.getElementById('config-modal').classList.add('open');
+  loadConfigUI();
 }
 
 function closeConfigModal() {
   document.getElementById('config-modal').classList.remove('open');
 }
 
-function updateConfigModal() {
-  const status = githubToken ? '✓ Connecté' : '✗ Déconnecté';
+function loadConfigUI() {
+  document.getElementById('config-token').value = githubToken || '';
+  
+  const status = githubToken ? 'Connecté ✓' : 'Déconnecté';
   document.getElementById('config-status').textContent = status;
   
   const lastSync = localStorage.getItem('otakutrack-lastsync');
-  const lastSyncText = lastSync ? new Date(lastSync).toLocaleString('fr-FR') : 'Jamais';
-  document.getElementById('config-last-sync').textContent = lastSyncText;
+  if (lastSync) {
+    const date = new Date(lastSync);
+    document.getElementById('config-last-sync').textContent = date.toLocaleString('fr-FR');
+  }
 }
 
 async function connectSync() {
   const token = document.getElementById('config-token').value.trim();
-  if (!token || token.includes('••')) {
-    if (githubToken) return; // Keep existing
-    alert('Veuillez entrer un token');
-    return;
-  }
+  if (!token) return alert('Veuillez entrer un token');
   
-  // Test token
-  try {
-    const res = await fetch('https://api.github.com/user', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Invalid token');
-    saveConfig(token);
-    setSyncStatus('syncing');
-    await syncToGithub();
-    alert('✓ Connecté et synchronisé !');
-  } catch (err) {
-    alert('Erreur: Token invalide');
-  }
+  githubToken = token;
+  saveConfig();
+  updateSyncIndicator();
+  await syncToGithub();
+  loadConfigUI();
+  alert('Connecté ! Les données seront synchronisées.');
 }
 
-// ===== CLOSE MODALS =====
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-  
-  document.getElementById('config-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeConfigModal();
-  });
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.getElementById('config-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfigModal();
 });
 
 // ===== INIT =====
-DB = loadData();
 loadConfig();
-renderAll();
+loadDatabase();
