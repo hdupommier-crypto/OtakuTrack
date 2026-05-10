@@ -574,14 +574,24 @@ function generateQRCode() {
 
   currentQRToken = token;
   const qrContainer = document.getElementById('qr-code');
+  
+  // 1. Vider le conteneur actuel
   qrContainer.innerHTML = '';
   
-  QRCode.toCanvas(qrContainer, token, {
+  // 2. Créer explicitement un élément canvas
+  const canvas = document.createElement('canvas');
+  qrContainer.appendChild(canvas);
+  
+  // 3. Utiliser QRCode.toCanvas sur le canvas qu'on vient de créer
+  QRCode.toCanvas(canvas, token, {
     width: 200,
     margin: 1,
     color: { dark: '#000000', light: '#ffffff' }
   }, function(error) {
-    if (error) console.error(error);
+    if (error) {
+      console.error("Erreur lors de la génération du QR code:", error);
+      alert("Erreur lors de la génération du QR code.");
+    }
   });
 
   document.getElementById('qr-display').style.display = 'block';
