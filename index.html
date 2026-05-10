@@ -509,9 +509,6 @@
   }
   .config-modal.open { display: flex; }
 
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
   @media (max-width: 600px) {
     main { padding: 1rem; }
     .grid { grid-template-columns: 1fr; }
@@ -629,7 +626,7 @@
       <label>Token GitHub (Gist)</label>
       <input class="form-input" id="config-token" type="password" placeholder="ghp_xxxxx..." autocomplete="off">
       <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">
-        📖 <a href="https://github.com/settings/tokens" target="_blank">Créer un token</a> (permission: gist)
+        📖 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);text-decoration:none;">Créer un token</a> (permission: gist)
       </div>
     </div>
 
