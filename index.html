@@ -8,7 +8,6 @@
 <meta name="description" content="Suivi personnel des animes et mangas">
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
   :root {
     --bg: #0a0a0f;
@@ -281,27 +280,6 @@
     transition: width 0.5s ease;
   }
 
-  .seasons-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 0.8rem;
-  }
-  .season-chip {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-  }
-  .season-chip.done { background: rgba(45,198,83,0.1); border-color: rgba(45,198,83,0.3); color: var(--green); }
-  .season-chip.partial { background: rgba(244,162,97,0.1); border-color: rgba(244,162,97,0.3); color: var(--accent2); }
-  .season-chip:hover { border-color: var(--text-dim); color: var(--text); }
-
   .seasons-toggle {
     display: flex;
     align-items: center;
@@ -531,40 +509,8 @@
   }
   .config-modal.open { display: flex; }
 
-  .tab-container {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0;
-  }
-  .config-tab {
-    padding: 0.75rem 1.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.2s;
-  }
-  .config-tab.active { color: var(--text); border-bottom-color: var(--accent); }
-  .config-tab:hover:not(.active) { color: var(--text); }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  .qr-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: var(--bg);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  #qr-code { background: white; padding: 1rem; border-radius: 6px; }
-  .qr-info { font-size: 0.75rem; color: var(--text-dim); text-align: center; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
 
   @media (max-width: 600px) {
     main { padding: 1rem; }
@@ -679,66 +625,25 @@
   <div class="modal">
     <h2>Configuration Sync</h2>
     
-    <div class="tab-container">
-      <div class="config-tab active" onclick="switchConfigTab('scan')">📱 Scanner QR</div>
-      <div class="config-tab" onclick="switchConfigTab('manual')">✍️ Manuel</div>
-      <div class="config-tab" onclick="switchConfigTab('status')">📊 État</div>
-    </div>
-
-    <!-- SCAN TAB -->
-    <div id="tab-scan" class="tab-content active">
-      <div style="padding: 1rem 0;">
-        <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem;">📷 Sur ton PC, génère le QR code et scanne-le ici avec ton téléphone.</p>
-        
-        <div class="qr-container" style="margin-bottom:1.5rem;">
-          <p style="font-size:0.8rem;color:var(--text-dim);">Pas encore de token ?</p>
-          <button class="btn-primary" onclick="generateQRCode()" style="width:100%;">Générer QR Code</button>
-        </div>
-
-        <div id="qr-display" style="display:none;">
-          <div class="qr-container">
-            <div id="qr-code"></div>
-            <div class="qr-info">Scanne ce code depuis ton téléphone pour charger le token automatiquement</div>
-            <button class="btn-sm" style="width:100%;" onclick="copyQRToken()">Copier le token</button>
-          </div>
-        </div>
-
-        <div style="margin-top:1rem;">
-          <label style="font-size:0.75rem;color:var(--text-dim);display:block;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.5px;">Ou colle un token scanné :</label>
-          <input class="form-input" id="config-token-scan" type="text" placeholder="Token depuis QR...">
-          <button class="btn-primary" style="width:100%;margin-top:0.5rem;" onclick="useScannedToken()">Utiliser ce token</button>
-        </div>
+    <div class="form-group">
+      <label>Token GitHub (Gist)</label>
+      <input class="form-input" id="config-token" type="password" placeholder="ghp_xxxxx..." autocomplete="off">
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">
+        📖 <a href="https://github.com/settings/tokens" target="_blank">Créer un token</a> (permission: gist)
       </div>
     </div>
 
-    <!-- MANUAL TAB -->
-    <div id="tab-manual" class="tab-content">
-      <div style="padding: 1rem 0;">
-        <div class="form-group">
-          <label>Token GitHub (Gist)</label>
-          <input class="form-input" id="config-token" type="password" placeholder="ghp_xxxxx..." autocomplete="off">
-          <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">
-            📖 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);text-decoration:none;">Créer un token</a> (permission: gist)
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATUS TAB -->
-    <div id="tab-status" class="tab-content">
-      <div style="background:var(--surface2);border-radius:6px;padding:1rem;margin-bottom:1rem;font-size:0.75rem;color:var(--text-dim);">
-        <strong style="color:var(--text);display:block;margin-bottom:0.5rem;">État de la synchronisation</strong>
-        <div style="margin-top:0.5rem;line-height:1.6;">
-          Status: <span id="config-status" style="color:var(--text);">Déconnecté</span><br>
-          Dernier sync: <span id="config-last-sync" style="color:var(--text);">Jamais</span><br>
-          Gist ID: <span id="config-gist-id" style="color:var(--text);font-family:monospace;font-size:0.7rem;">—</span>
-        </div>
+    <div style="background:var(--surface2);border-radius:6px;padding:1rem;margin-bottom:1rem;font-size:0.75rem;color:var(--text-dim);">
+      <strong style="color:var(--text);">État:</strong><br>
+      <div style="margin-top:0.5rem;">
+        Status: <span id="config-status" style="color:var(--text);">Déconnecté</span><br>
+        Dernier sync: <span id="config-last-sync" style="color:var(--text);">Jamais</span>
       </div>
     </div>
 
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeConfigModal()">Fermer</button>
-      <button class="btn-primary" onclick="connectSync()" id="btn-connect-sync">Connecter</button>
+      <button class="btn-primary" onclick="connectSync()">Connecter</button>
     </div>
   </div>
 </div>
