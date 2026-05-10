@@ -1,4 +1,4 @@
-// ===== DATA =====
+// ===== INITIAL DATA =====
 const INITIAL_ANIMES = [
   { id:'a1', title:'Black Clover', type:'anime', seasons:[
     {name:'s1', eps:170, watched:170, epDur:20},
@@ -149,23 +149,153 @@ let currentTab = 'anime';
 let currentFilter = 'all';
 let editingId = null;
 let modalType = 'anime';
-let currentQRToken = null;
+let seasonFields = [];
 
+// GitHub Sync
+let githubToken = null;
+let gistId = null;
+let syncStatus = 'local'; // 'local', 'synced', 'syncing', 'error'
+
+let DB = { animes: [], mangas: [] };
+
+// ===== STORAGE =====
 function loadData() {
   try {
     const stored = localStorage.getItem('otakutrack-data');
     if (stored) return JSON.parse(stored);
   } catch(e) {}
-  return { animes: INITIAL_ANIMES, mangas: INITIAL_MANGAS };
+  return { animes: INITIAL_ANIMES.map(a => ({...a})), mangas: INITIAL_MANGAS.map(m => ({...m})) };
 }
 
 function saveData(data) {
   localStorage.setItem('otakutrack-data', JSON.stringify(data));
-  localStorage.setItem('otakutrack-lastupdate', Date.now());
+  updateSyncStatus();
 }
 
-let DB = loadData();
+function loadConfig() {
+  githubToken = localStorage.getItem('otakutrack-token') || null;
+  gistId = localStorage.getItem('otakutrack-gistid') || null;
+  document.getElementById('config-token').value = githubToken ? '••••••••••' : '';
+  updateConfigModal();
+}
 
+function saveConfig(token) {
+  if (token && token.length > 10) {
+    githubToken = token;
+    localStorage.setItem('otakutrack-token', token);
+  }
+  updateConfigModal();
+}
+
+// ===== GITHUB SYNC =====
+async function syncToGithub() {
+  if (!githubToken) return;
+  
+  setSyncStatus('syncing');
+  try {
+    const dataStr = JSON.stringify(DB, null, 2);
+    
+    if (!gistId) {
+      // Create new gist
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${githubToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description: 'OtakuTrack sync',
+          public: false,
+          files: {
+            'otakutrack-data.json': {
+              content: dataStr
+            }
+          }
+        })
+      });
+      if (!res.ok) throw new Error('Gist creation failed');
+      const gist = await res.json();
+      gistId = gist.id;
+      localStorage.setItem('otakutrack-gistid', gistId);
+    } else {
+      // Update existing gist
+      const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${githubToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          files: {
+            'otakutrack-data.json': {
+              content: dataStr
+            }
+          }
+        })
+      });
+      if (!res.ok) throw new Error('Gist update failed');
+    }
+    
+    setSyncStatus('synced');
+    localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+  } catch (err) {
+    console.error('Sync error:', err);
+    setSyncStatus('error');
+  }
+}
+
+async function syncFromGithub() {
+  if (!githubToken || !gistId) return;
+  
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: {
+        'Authorization': `Bearer ${githubToken}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!res.ok) throw new Error('Fetch failed');
+    const gist = await res.json();
+    const dataStr = gist.files['otakutrack-data.json'].content;
+    const remoteData = JSON.parse(dataStr);
+    DB = remoteData;
+    localStorage.setItem('otakutrack-data', JSON.stringify(DB));
+    setSyncStatus('synced');
+    renderAll();
+  } catch (err) {
+    console.error('Pull error:', err);
+  }
+}
+
+function setSyncStatus(status) {
+  syncStatus = status;
+  const dot = document.getElementById('sync-dot');
+  const text = document.getElementById('sync-text');
+  
+  if (status === 'syncing') {
+    dot.classList.remove('synced');
+    dot.classList.add('syncing');
+    text.textContent = 'Sync...';
+  } else if (status === 'synced') {
+    dot.classList.remove('syncing');
+    dot.classList.add('synced');
+    text.textContent = 'Synced';
+  } else if (status === 'error') {
+    dot.classList.remove('synced', 'syncing');
+    text.textContent = 'Erreur';
+  } else {
+    dot.classList.remove('synced', 'syncing');
+    text.textContent = 'Local';
+  }
+}
+
+function updateSyncStatus() {
+  if (githubToken && gistId) {
+    setTimeout(() => syncToGithub(), 500);
+  }
+}
+
+// ===== UTILS =====
 function getStatus(item) {
   if (item.type === 'manga') {
     if (item.total === 0) return 'pas-commence';
@@ -421,8 +551,6 @@ function deleteEntry(id) {
 }
 
 // ===== MODAL =====
-let seasonFields = [];
-
 function openModal(id = null) {
   editingId = id;
   seasonFields = [];
@@ -533,127 +661,60 @@ function saveEntry() {
 
 function editEntry(id) { openModal(id); }
 
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
 // ===== CONFIG MODAL =====
 function showConfigModal() {
+  updateConfigModal();
   document.getElementById('config-modal').classList.add('open');
-  updateConfigStatus();
 }
 
 function closeConfigModal() {
   document.getElementById('config-modal').classList.remove('open');
 }
 
-function switchConfigTab(tab) {
-  document.querySelectorAll('.config-tab').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  
-  document.querySelector(`.config-tab:nth-child(${tab === 'scan' ? 1 : tab === 'manual' ? 2 : 3})`).classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-  
-  if (tab === 'scan') {
-    const token = localStorage.getItem('otakutrack-token');
-    if (token) {
-      currentQRToken = token;
-      generateQRCode();
-    }
-  }
-}
-
-function generateQRCode() {
-  const token = document.getElementById('config-token').value.trim() || localStorage.getItem('otakutrack-token');
-  
-  if (!token) {
-    alert('Merci d\'entrer un token d\'abord (onglet Manuel)');
-    switchConfigTab('manual');
-    return;
-  }
-
-  currentQRToken = token;
-  const qrContainer = document.getElementById('qr-code');
-  
-  // 1. Vider le conteneur actuel
-  qrContainer.innerHTML = '';
-  
-  // 2. Créer explicitement un élément canvas
-  const canvas = document.createElement('canvas');
-  qrContainer.appendChild(canvas);
-  
-  // 3. Utiliser QRCode.toCanvas sur le canvas qu'on vient de créer
-  QRCode.toCanvas(canvas, token, {
-    width: 200,
-    margin: 1,
-    color: { dark: '#000000', light: '#ffffff' }
-  }, function(error) {
-    if (error) {
-      console.error("Erreur lors de la génération du QR code:", error);
-      alert("Erreur lors de la génération du QR code.");
-    }
-  });
-
-  document.getElementById('qr-display').style.display = 'block';
-}
-
-function copyQRToken() {
-  if (!currentQRToken) return;
-  navigator.clipboard.writeText(currentQRToken).then(() => {
-    alert('Token copié! 📋');
-  });
-}
-
-function useScannedToken() {
-  const token = document.getElementById('config-token-scan').value.trim();
-  if (!token) return alert('Colle un token');
-  
-  document.getElementById('config-token').value = token;
-  connectSync();
-  switchConfigTab('status');
-}
-
-function connectSync() {
-  const token = document.getElementById('config-token').value.trim();
-  
-  if (!token) {
-    alert('Merci d\'entrer un token');
-    return;
-  }
-
-  localStorage.setItem('otakutrack-token', token);
-  alert('✅ Token sauvegardé! Synchronisation activée.');
-  updateConfigStatus();
-  closeConfigModal();
-  renderAll();
-}
-
-function updateConfigStatus() {
-  const token = localStorage.getItem('otakutrack-token');
-  const gistId = localStorage.getItem('otakutrack-gist-id');
-  const lastSync = localStorage.getItem('otakutrack-last-sync');
-
-  const status = token ? '✅ Connecté' : '❌ Déconnecté';
-  const syncText = lastSync ? new Date(parseInt(lastSync)).toLocaleString() : 'Jamais';
-  const gistDisplay = gistId || '—';
-
+function updateConfigModal() {
+  const status = githubToken ? '✓ Connecté' : '✗ Déconnecté';
   document.getElementById('config-status').textContent = status;
-  document.getElementById('config-last-sync').textContent = syncText;
-  document.getElementById('config-gist-id').textContent = gistDisplay;
   
-  if (token) {
-    document.getElementById('sync-dot').className = 'sync-dot synced';
-    document.getElementById('sync-text').textContent = 'Synced';
-  } else {
-    document.getElementById('sync-dot').className = 'sync-dot';
-    document.getElementById('sync-text').textContent = 'Local';
+  const lastSync = localStorage.getItem('otakutrack-lastsync');
+  const lastSyncText = lastSync ? new Date(lastSync).toLocaleString('fr-FR') : 'Jamais';
+  document.getElementById('config-last-sync').textContent = lastSyncText;
+}
+
+async function connectSync() {
+  const token = document.getElementById('config-token').value.trim();
+  if (!token || token.includes('••')) {
+    if (githubToken) return; // Keep existing
+    alert('Veuillez entrer un token');
+    return;
+  }
+  
+  // Test token
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Invalid token');
+    saveConfig(token);
+    setSyncStatus('syncing');
+    await syncToGithub();
+    alert('✓ Connecté et synchronisé !');
+  } catch (err) {
+    alert('Erreur: Token invalide');
   }
 }
 
-document.getElementById('config-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeConfigModal();
+// ===== CLOSE MODALS =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  
+  document.getElementById('config-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfigModal();
+  });
 });
 
 // ===== INIT =====
+DB = loadData();
+loadConfig();
 renderAll();
-updateConfigStatus();
