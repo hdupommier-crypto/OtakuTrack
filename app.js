@@ -14,11 +14,134 @@ const INITIAL_ANIMES = [
     {name:'s4', eps:23, watched:23, epDur:20},
     {name:'Films', eps:4, watched:4, epDur:110}
   ]},
+  { id:'a3', title:'Classroom of the Élite', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:20},
+    {name:'s2', eps:13, watched:13, epDur:20}
+  ]},
+  { id:'a4', title:'Great Pretender', type:'anime', seasons:[
+    {name:'s1', eps:23, watched:23, epDur:20},
+    {name:'Film', eps:1, watched:0, epDur:90}
+  ]},
+  { id:'a5', title:'Your Name', type:'anime', seasons:[
+    {name:'Film', eps:1, watched:1, epDur:100}
+  ]},
+  { id:'a6', title:'Le garçon et la bête', type:'anime', seasons:[
+    {name:'Film', eps:1, watched:1, epDur:110}
+  ]},
+  { id:'a7', title:'Fire Force', type:'anime', seasons:[
+    {name:'s1', eps:24, watched:24, epDur:20},
+    {name:'s2', eps:24, watched:24, epDur:20},
+    {name:'s3', eps:25, watched:12, epDur:20}
+  ]},
+  { id:'a8', title:"Jojo's Bizarre Adventure", type:'anime', seasons:[
+    {name:'s1', eps:9, watched:0, epDur:20},
+    {name:'s2', eps:17, watched:0, epDur:20},
+    {name:'s3', eps:48, watched:0, epDur:20},
+    {name:'s4', eps:39, watched:0, epDur:20},
+    {name:'OAV', eps:4, watched:0, epDur:20},
+    {name:'s5', eps:39, watched:0, epDur:20},
+    {name:'s6', eps:38, watched:0, epDur:20}
+  ]},
+  { id:'a9', title:'Shibukui Bisco', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:20}
+  ]},
+  { id:'a10', title:'Cheat Skill Level Up', type:'anime', seasons:[
+    {name:'s1', eps:13, watched:13, epDur:20}
+  ]},
+  { id:'a11', title:'Fairy Tails', type:'anime', seasons:[
+    {name:'Films', eps:2, watched:0, epDur:90}
+  ]},
+  { id:'a12', title:'Level 1 Dakedo Unique Skill', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:20}
+  ]},
+  { id:'a13', title:'Farming Life in Another World', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:20},
+    {name:'s2', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a14', title:'Solo Leveling', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:20},
+    {name:'s2', eps:13, watched:13, epDur:20}
+  ]},
+  { id:'a15', title:'The Rising of the Shield Hero', type:'anime', seasons:[
+    {name:'s1', eps:25, watched:25, epDur:20},
+    {name:'s2', eps:13, watched:13, epDur:20},
+    {name:'s3', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a16', title:'Tales of Demons and Gods', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:12, epDur:25},
+    {name:'s2', eps:12, watched:12, epDur:25},
+    {name:'s3', eps:12, watched:5, epDur:25},
+    {name:'s4', eps:12, watched:0, epDur:25}
+  ]},
+  { id:'a17', title:'Zom 100', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a18', title:'Gate', type:'anime', seasons:[
+    {name:'s1', eps:24, watched:0, epDur:20}
+  ]},
+  { id:'a19', title:'Undead Unluck', type:'anime', seasons:[
+    {name:'s1', eps:24, watched:0, epDur:20}
+  ]},
+  { id:'a20', title:'Frieren', type:'anime', seasons:[
+    {name:'s1', eps:28, watched:0, epDur:20}
+  ]},
+  { id:'a21', title:'Sakamoto Days', type:'anime', seasons:[
+    {name:'s1 p1', eps:11, watched:0, epDur:20},
+    {name:'s1 p2', eps:11, watched:0, epDur:20}
+  ]},
+  { id:'a22', title:'Lord of Mysteries', type:'anime', seasons:[
+    {name:'s1', eps:13, watched:0, epDur:20},
+    {name:'OAV', eps:9, watched:0, epDur:20}
+  ]},
+  { id:'a23', title:'One Punch Man', type:'anime', seasons:[
+    {name:'s1', eps:12, watched:0, epDur:20},
+    {name:'s2', eps:12, watched:0, epDur:20},
+    {name:'s3', eps:5, watched:0, epDur:20},
+    {name:'OAV', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a24', title:'Konosuba', type:'anime', seasons:[
+    {name:'s1', eps:11, watched:11, epDur:20},
+    {name:'s2', eps:11, watched:0, epDur:20},
+    {name:'s3', eps:11, watched:0, epDur:20},
+    {name:'s3 OAV', eps:2, watched:0, epDur:20},
+    {name:'Film', eps:1, watched:0, epDur:90},
+    {name:'Explosion', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a25', title:'The Eminence in Shadow', type:'anime', seasons:[
+    {name:'s1', eps:20, watched:0, epDur:20},
+    {name:'s2', eps:12, watched:0, epDur:20}
+  ]},
+  { id:'a26', title:'Re:Zero', type:'anime', seasons:[
+    {name:'s1', eps:13, watched:13, epDur:45},
+    {name:'s2', eps:25, watched:12, epDur:25},
+    {name:'s3', eps:16, watched:0, epDur:20},
+    {name:'s4', eps:2, watched:0, epDur:20},
+    {name:'Films', eps:2, watched:1, epDur:70}
+  ]},
+  { id:'a27', title:"L'Atelier des Sorciers", type:'anime', seasons:[
+    {name:'s1', eps:6, watched:6, epDur:20}
+  ]},
+  { id:'a28', title:'Tsugai', type:'anime', seasons:[
+    {name:'s1', eps:5, watched:0, epDur:20}
+  ]},
+  { id:'a29', title:'Mushoku Tensei', type:'anime', seasons:[] },
+  { id:'a30', title:'Overlord', type:'anime', seasons:[] },
+  { id:'a31', title:'I Parry Everything', type:'anime', seasons:[] },
 ];
 
 const INITIAL_MANGAS = [
   { id:'m1', title:'Gloutons et Dragons', type:'manga', total:11, read:11, notes:'' },
   { id:'m2', title:'Fullmetal Alchemist', type:'manga', total:27, read:27, notes:'' },
+  { id:'m3', title:'Hunter x Hunter', type:'manga', total:37, read:36, notes:'' },
+  { id:'m4', title:'My Hero Academia', type:'manga', total:35, read:35, notes:'' },
+  { id:'m5', title:'Magus of the Library', type:'manga', total:4, read:4, notes:'' },
+  { id:'m6', title:'One Piece', type:'manga', total:101, read:21, notes:'' },
+  { id:'m7', title:'Naruto', type:'manga', total:72, read:33, notes:'' },
+  { id:'m8', title:'Fairy Tail', type:'manga', total:63, read:63, notes:'' },
+  { id:'m9', title:'Eden Zero', type:'manga', total:16, read:16, notes:'' },
+  { id:'m10', title:'Créatures Fantastiques', type:'manga', total:5, read:5, notes:'' },
+  { id:'m11', title:"Félin pour l'autre", type:'manga', total:6, read:6, notes:'' },
+  { id:'m12', title:'Black Clover', type:'manga', total:9, read:9, notes:'Scans lus jusqu\'au chap. 383/389' },
 ];
 
 // ===== STATE =====
@@ -26,13 +149,8 @@ let currentTab = 'anime';
 let currentFilter = 'all';
 let editingId = null;
 let modalType = 'anime';
-let seasonFields = [];
+let currentQRToken = null;
 
-let DB = loadData();
-let githubToken = localStorage.getItem('otakutrack-token') || null;
-let gistId = localStorage.getItem('otakutrack-gistid') || null;
-
-// ===== STORAGE =====
 function loadData() {
   try {
     const stored = localStorage.getItem('otakutrack-data');
@@ -44,247 +162,10 @@ function loadData() {
 function saveData(data) {
   localStorage.setItem('otakutrack-data', JSON.stringify(data));
   localStorage.setItem('otakutrack-lastupdate', Date.now());
-  updateSyncStatus();
-  syncToGithub();
 }
 
-// ===== GITHUB SYNC =====
-async function syncToGithub() {
-  if (!githubToken || !gistId) return;
-  
-  updateSyncStatus('syncing');
-  try {
-    const content = JSON.stringify(DB, null, 2);
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `token ${githubToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        files: {
-          'otakutrack-data.json': { content }
-        }
-      })
-    });
-    if (response.ok) {
-      localStorage.setItem('otakutrack-lastupdate', Date.now());
-      updateSyncStatus('synced');
-    }
-  } catch(e) {
-    console.error('Sync error:', e);
-    updateSyncStatus('error');
-  }
-}
+let DB = loadData();
 
-async function syncFromGithub() {
-  if (!githubToken || !gistId) return;
-  
-  try {
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-      headers: { 'Authorization': `token ${githubToken}` }
-    });
-    if (response.ok) {
-      const gist = await response.json();
-      const file = gist.files['otakutrack-data.json'];
-      if (file) {
-        DB = JSON.parse(file.content);
-        localStorage.setItem('otakutrack-data', file.content);
-        renderAll();
-        updateSyncStatus('synced');
-      }
-    }
-  } catch(e) {
-    console.error('Sync error:', e);
-  }
-}
-
-async function testSync() {
-  if (!githubToken || !gistId) {
-    alert('Non connecté');
-    return;
-  }
-  try {
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-      headers: { 'Authorization': `token ${githubToken}` }
-    });
-    if (response.ok) {
-      alert('✅ Connexion à GitHub OK !');
-    } else {
-      alert('❌ Erreur: ' + response.status);
-    }
-  } catch(e) {
-    alert('❌ Erreur: ' + e.message);
-  }
-}
-
-// ===== SYNC STATUS =====
-function updateSyncStatus(status = null) {
-  const dot = document.getElementById('sync-dot');
-  const text = document.getElementById('sync-text');
-  
-  if (status === 'syncing') {
-    dot.className = 'sync-dot syncing';
-    text.textContent = 'Sync...';
-  } else if (status === 'synced' || (githubToken && gistId)) {
-    dot.className = 'sync-dot synced';
-    text.textContent = 'Synced';
-  } else if (status === 'error') {
-    dot.className = 'sync-dot';
-    text.textContent = 'Erreur';
-  } else {
-    dot.className = 'sync-dot';
-    text.textContent = 'Local';
-  }
-
-  // Mise à jour tab Etat
-  const connected = document.getElementById('status-connected');
-  if (connected) {
-    if (githubToken && gistId) {
-      connected.textContent = '✓ Connecté';
-      connected.className = 'status-value connected';
-    } else {
-      connected.textContent = 'Déconnecté';
-      connected.className = 'status-value error';
-    }
-  }
-  
-  const lastSync = document.getElementById('status-last-sync');
-  if (lastSync) {
-    const ts = localStorage.getItem('otakutrack-lastupdate');
-    if (ts) {
-      const date = new Date(parseInt(ts));
-      lastSync.textContent = date.toLocaleTimeString();
-    } else {
-      lastSync.textContent = 'Jamais';
-    }
-  }
-
-  const storage = document.getElementById('status-storage');
-  if (storage) {
-    const total = DB.animes.length + DB.mangas.length;
-    storage.textContent = total + ' items';
-  }
-
-  const gistIdEl = document.getElementById('status-gist-id');
-  if (gistIdEl) {
-    gistIdEl.textContent = gistId ? gistId.substring(0, 8) + '...' : 'N/A';
-  }
-}
-
-// ===== QR CODE =====
-function generateQRCode() {
-  if (!githubToken) {
-    alert('Entre un token d\'abord');
-    return;
-  }
-  
-  const container = document.getElementById('qr-code-container');
-  container.innerHTML = '';
-  
-  const qrData = {
-    token: githubToken,
-    gist: gistId || 'new'
-  };
-  const qrText = JSON.stringify(qrData);
-  
-  const script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-  script.onload = () => {
-    new QRCode(container, {
-      text: qrText,
-      width: 200,
-      height: 200,
-      colorDark: '#e63946',
-      colorLight: '#ffffff'
-    });
-  };
-  document.head.appendChild(script);
-}
-
-// ===== CONFIG MODAL =====
-function showConfigModal() {
-  document.getElementById('config-modal').classList.add('open');
-  document.getElementById('config-token').value = githubToken || '';
-  updateSyncStatus();
-}
-
-function closeConfigModal() {
-  document.getElementById('config-modal').classList.remove('open');
-}
-
-function switchConfigTab(tab) {
-  document.querySelectorAll('.config-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.config-tab').forEach(el => el.classList.remove('active'));
-  
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
-  
-  if (tab === 'qr') generateQRCode();
-}
-
-async function connectSync() {
-  const token = document.getElementById('config-token').value.trim();
-  if (!token) {
-    alert('Entre un token');
-    return;
-  }
-  
-  try {
-    // Test token
-    const response = await fetch('https://api.github.com/user', {
-      headers: { 'Authorization': `token ${token}` }
-    });
-    if (!response.ok) throw new Error('Token invalide');
-    
-    // Créer ou récupérer le Gist
-    if (!gistId) {
-      const createRes = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          description: 'OtakuTrack - Données personnelles',
-          public: false,
-          files: {
-            'otakutrack-data.json': {
-              content: JSON.stringify(DB, null, 2)
-            }
-          }
-        })
-      });
-      if (!createRes.ok) throw new Error('Erreur création Gist');
-      const gist = await createRes.json();
-      gistId = gist.id;
-      localStorage.setItem('otakutrack-gistid', gistId);
-    }
-    
-    githubToken = token;
-    localStorage.setItem('otakutrack-token', token);
-    
-    await syncToGithub();
-    alert('✅ Connecté à GitHub !');
-    updateSyncStatus('synced');
-    
-  } catch(e) {
-    alert('❌ Erreur: ' + e.message);
-  }
-}
-
-function disconnectSync() {
-  if (confirm('Déconnecter GitHub ? (les données locales restent)')) {
-    githubToken = null;
-    gistId = null;
-    localStorage.removeItem('otakutrack-token');
-    localStorage.removeItem('otakutrack-gistid');
-    updateSyncStatus();
-    closeConfigModal();
-  }
-}
-
-// ===== UTILS =====
 function getStatus(item) {
   if (item.type === 'manga') {
     if (item.total === 0) return 'pas-commence';
@@ -508,7 +389,9 @@ function quickEpisode(animeId, seasonIdx) {
     se.watched++;
     saveData(DB);
     const detailEl = document.getElementById('detail-' + animeId);
+    const toggleEl = document.getElementById('toggle-' + animeId);
     if (detailEl && detailEl.classList.contains('open')) {
+      const wasOpen = true;
       renderAll();
       const newDetail = document.getElementById('detail-' + animeId);
       const newToggle = document.getElementById('toggle-' + animeId);
@@ -538,6 +421,8 @@ function deleteEntry(id) {
 }
 
 // ===== MODAL =====
+let seasonFields = [];
+
 function openModal(id = null) {
   editingId = id;
   seasonFields = [];
@@ -548,7 +433,6 @@ function openModal(id = null) {
     selectModalType(item.type);
     if (item.type === 'anime') {
       document.getElementById('m-title').value = item.title;
-      document.getElementById('seasons-list').innerHTML = '';
       item.seasons.forEach(se => addSeasonField(se));
     } else {
       document.getElementById('m-manga-title').value = item.title;
@@ -564,6 +448,7 @@ function openModal(id = null) {
     document.getElementById('m-total').value = '';
     document.getElementById('m-read').value = '';
     document.getElementById('m-notes').value = '';
+    if (modalType === 'anime') addSeasonField();
   }
 
   document.getElementById('modal').classList.add('open');
@@ -580,10 +465,7 @@ function selectModalType(type) {
   document.getElementById('mtype-manga').classList.toggle('active', type === 'manga');
   document.getElementById('anime-form').style.display = type === 'anime' ? '' : 'none';
   document.getElementById('manga-form').style.display = type === 'manga' ? '' : 'none';
-  if (type === 'anime' && seasonFields.length === 0) {
-    document.getElementById('seasons-list').innerHTML = '';
-    addSeasonField();
-  }
+  if (type === 'anime' && seasonFields.length === 0) addSeasonField();
 }
 
 function addSeasonField(se = null) {
@@ -655,11 +537,113 @@ document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
+// ===== CONFIG MODAL =====
+function showConfigModal() {
+  document.getElementById('config-modal').classList.add('open');
+  updateConfigStatus();
+}
+
+function closeConfigModal() {
+  document.getElementById('config-modal').classList.remove('open');
+}
+
+function switchConfigTab(tab) {
+  document.querySelectorAll('.config-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  
+  document.querySelector(`.config-tab:nth-child(${tab === 'scan' ? 1 : tab === 'manual' ? 2 : 3})`).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  
+  if (tab === 'scan') {
+    const token = localStorage.getItem('otakutrack-token');
+    if (token) {
+      currentQRToken = token;
+      generateQRCode();
+    }
+  }
+}
+
+function generateQRCode() {
+  const token = document.getElementById('config-token').value.trim() || localStorage.getItem('otakutrack-token');
+  
+  if (!token) {
+    alert('Merci d\'entrer un token d\'abord (onglet Manuel)');
+    switchConfigTab('manual');
+    return;
+  }
+
+  currentQRToken = token;
+  const qrContainer = document.getElementById('qr-code');
+  qrContainer.innerHTML = '';
+  
+  QRCode.toCanvas(qrContainer, token, {
+    width: 200,
+    margin: 1,
+    color: { dark: '#000000', light: '#ffffff' }
+  }, function(error) {
+    if (error) console.error(error);
+  });
+
+  document.getElementById('qr-display').style.display = 'block';
+}
+
+function copyQRToken() {
+  if (!currentQRToken) return;
+  navigator.clipboard.writeText(currentQRToken).then(() => {
+    alert('Token copié! 📋');
+  });
+}
+
+function useScannedToken() {
+  const token = document.getElementById('config-token-scan').value.trim();
+  if (!token) return alert('Colle un token');
+  
+  document.getElementById('config-token').value = token;
+  connectSync();
+  switchConfigTab('status');
+}
+
+function connectSync() {
+  const token = document.getElementById('config-token').value.trim();
+  
+  if (!token) {
+    alert('Merci d\'entrer un token');
+    return;
+  }
+
+  localStorage.setItem('otakutrack-token', token);
+  alert('✅ Token sauvegardé! Synchronisation activée.');
+  updateConfigStatus();
+  closeConfigModal();
+  renderAll();
+}
+
+function updateConfigStatus() {
+  const token = localStorage.getItem('otakutrack-token');
+  const gistId = localStorage.getItem('otakutrack-gist-id');
+  const lastSync = localStorage.getItem('otakutrack-last-sync');
+
+  const status = token ? '✅ Connecté' : '❌ Déconnecté';
+  const syncText = lastSync ? new Date(parseInt(lastSync)).toLocaleString() : 'Jamais';
+  const gistDisplay = gistId || '—';
+
+  document.getElementById('config-status').textContent = status;
+  document.getElementById('config-last-sync').textContent = syncText;
+  document.getElementById('config-gist-id').textContent = gistDisplay;
+  
+  if (token) {
+    document.getElementById('sync-dot').className = 'sync-dot synced';
+    document.getElementById('sync-text').textContent = 'Synced';
+  } else {
+    document.getElementById('sync-dot').className = 'sync-dot';
+    document.getElementById('sync-text').textContent = 'Local';
+  }
+}
+
 document.getElementById('config-modal').addEventListener('click', function(e) {
   if (e.target === this) closeConfigModal();
 });
 
 // ===== INIT =====
 renderAll();
-updateSyncStatus();
-if (githubToken && gistId) syncFromGithub();
+updateConfigStatus();
