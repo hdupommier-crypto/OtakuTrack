@@ -1,0 +1,18 @@
+{
+  "name": "OtakuTrack",
+  "short_name": "OtakuTrack",
+  "description": "Suivi personnel des animes et mangas avec sync cloud",
+  "start_url": "/OtakuTrack_app/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#e63946",
+  "scope": "/OtakuTrack_app/",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230a0a0f' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-family='Bebas Neue,sans-serif' fill='%23e63946' text-anchor='middle' dominant-baseline='middle' font-weight='bold'>OT</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
