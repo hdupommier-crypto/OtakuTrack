@@ -161,23 +161,44 @@ async function syncToSupabase() {
   dot.className = 'sync-dot syncing';
   
   try {
-    // Supprimer toutes les données existantes et réinsérer
-    await supabaseClient.from('animes').delete().neq('id', '');
-    await supabaseClient.from('mangas').delete().neq('id', '');
-    
-    // Insérer les nouvelles données
-    if (DB.animes.length > 0) {
-      await supabaseClient.from('animes').insert(DB.animes);
+    // SÉCURITÉ CRITIQUE : Ne jamais synchroniser si les tableaux sont vides
+    // Cela empêche d'effacer la base de données par accident
+    if (DB.animes.length === 0 && DB.mangas.length === 0) {
+      console.warn('⚠️ TENTATIVE DE SYNCHRONISATION VIDE BLOQUÉE ! Les données locales sont vides, on annule pour protéger la DB.');
+      dot.className = 'sync-dot error';
+      showNotification('Synchronisation annulée: Données locales vides', 'error');
+      return;
     }
+
+    // Utiliser upsert au lieu de delete+insert pour éviter les pertes de données
+    // Upsert met à jour les lignes existantes et ajoute les nouvelles sans toucher aux autres
+    if (DB.animes.length > 0) {
+      console.log(`Sauvegarde de ${DB.animes.length} animes...`);
+      const { error: animeError } = await supabaseClient
+        .from('animes')
+        .upsert(DB.animes, { onConflict: 'id' });
+      
+      if (animeError) throw animeError;
+    }
+
     if (DB.mangas.length > 0) {
-      await supabaseClient.from('mangas').insert(DB.mangas);
+      console.log(`Sauvegarde de ${DB.mangas.length} mangas...`);
+      const { error: mangaError } = await supabaseClient
+        .from('mangas')
+        .upsert(DB.mangas, { onConflict: 'id' });
+      
+      if (mangaError) throw mangaError;
     }
     
     dot.className = 'sync-dot synced';
     localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+    console.log('✅ Synchronisation réussie et sécurisée');
   } catch (error) {
-    console.error('Erreur sync Supabase:', error);
-    dot.className = 'sync-dot';
+    console.error('❌ Erreur critique sync Supabase:', error);
+    dot.className = 'sync-dot error';
+    showNotification('Erreur de synchronisation: ' + error.message, 'error');
+    // En cas d'erreur, on recharge les données depuis Supabase pour éviter toute perte
+    await syncFromSupabase();
   }
 }
 
