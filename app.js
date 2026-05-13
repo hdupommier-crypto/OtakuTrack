@@ -7,6 +7,9 @@ let supabaseClient = null;
 const SUPABASE_URL = 'https://alzbwiqgoaosyohwiakr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsemJ3aXFnb2Fvc3lvaHdpYWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM3MTQsImV4cCI6MjA5NDI1OTcxNH0.s7CwqRz4DKdtZAlNQ9Yw5iaahS_LE52gsMlxSeZo_ys';
 
+let manualSupabaseUrl = '';
+let manualSupabaseKey = '';
+
 async function initSupabase() {
   if (!window.supabase) {
     console.error('Supabase JS non chargé');
@@ -14,6 +17,96 @@ async function initSupabase() {
   }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return true;
+}
+
+async function connectSupabasePreconfig() {
+  console.log('Connexion Supabase avec identifiants pré-configurés...');
+  
+  useSupabase = true;
+  
+  console.log('Initialisation client Supabase...');
+  if (!window.supabase) {
+    console.error('Librairie Supabase non chargée!');
+    return alert('Erreur: Librairie Supabase non chargée. Vérifiez votre connexion internet.');
+  }
+  
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('Client Supabase créé');
+  
+  try {
+    console.log('Test de connexion...');
+    const { data, error } = await supabaseClient.from('animes').select('*').limit(1);
+    if (error && error.code !== 'PGRST102') {
+      console.error('Erreur test Supabase:', error);
+      alert('Erreur de connexion à Supabase: ' + error.message);
+      return;
+    }
+    
+    console.log('Connexion réussie, sauvegarde config...');
+    saveConfig();
+    updateSyncIndicator();
+    await syncData();
+    loadConfigUI();
+    alert('Connecté à Supabase ! Synchronisation activée.');
+  } catch (error) {
+    console.error('Erreur connexion Supabase:', error);
+    alert('Erreur de connexion à Supabase: ' + error.message);
+  }
+}
+
+function enableManualInput() {
+  document.getElementById('supabase-url').removeAttribute('readonly');
+  document.getElementById('supabase-key').removeAttribute('readonly');
+  document.getElementById('supabase-url').style.background = 'var(--bg)';
+  document.getElementById('supabase-key').style.background = 'var(--bg)';
+  document.getElementById('supabase-url').style.color = 'var(--text)';
+  document.getElementById('supabase-key').style.color = 'var(--text)';
+  document.getElementById('btn-connect-manual').style.display = 'block';
+  document.getElementById('supabase-url').focus();
+}
+
+async function connectSupabaseManual() {
+  const url = document.getElementById('supabase-url').value.trim();
+  const key = document.getElementById('supabase-key').value.trim();
+  
+  if (!url || !key) {
+    return alert('URL et clé requises');
+  }
+  
+  console.log('Connexion Supabase avec identifiants manuels...');
+  useSupabase = true;
+  
+  if (!window.supabase) {
+    console.error('Librairie Supabase non chargée!');
+    return alert('Erreur: Librairie Supabase non chargée.');
+  }
+  
+  supabaseClient = window.supabase.createClient(url, key);
+  console.log('Client Supabase créé avec identifiants manuels');
+  
+  try {
+    console.log('Test de connexion...');
+    const { data, error } = await supabaseClient.from('animes').select('*').limit(1);
+    if (error && error.code !== 'PGRST102') {
+      console.error('Erreur test Supabase:', error);
+      alert('Erreur de connexion à Supabase: ' + error.message);
+      return;
+    }
+    
+    // Sauvegarder les identifiants manuels pour usage futur
+    manualSupabaseUrl = url;
+    manualSupabaseKey = key;
+    
+    console.log('Connexion réussie, sauvegarde config...');
+    saveConfig();
+    updateSyncIndicator();
+    await syncData();
+    loadConfigUI();
+    alert('Connecté à Supabase ! Synchronisation activée.');
+  } catch (error) {
+    console.error('Erreur connexion Supabase:', error);
+    alert('Erreur de connexion à Supabase: ' + error.message);
+  }
 }
 
 async function loadDatabase() {
@@ -522,47 +615,12 @@ function loadConfigUI() {
   }
 }
 
-async function connectSupabase() {
-  console.log('Connexion Supabase avec identifiants pré-configurés...');
-  
-  useSupabase = true;
-  
-  // Initialiser le client Supabase
-  console.log('Initialisation client Supabase...');
-  if (!window.supabase) {
-    console.error('Librairie Supabase non chargée!');
-    return alert('Erreur: Librairie Supabase non chargée. Vérifiez votre connexion internet.');
-  }
-  
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('Client Supabase créé');
-  
-  // Tester la connexion
-  try {
-    console.log('Test de connexion...');
-    const { data, error } = await supabaseClient.from('animes').select('*').limit(1);
-    if (error && error.code !== 'PGRST102') {
-      console.error('Erreur test Supabase:', error);
-      alert('Erreur de connexion à Supabase: ' + error.message);
-      return;
-    }
-    
-    console.log('Connexion réussie, sauvegarde config...');
-    saveConfig();
-    updateSyncIndicator();
-    await syncData();
-    loadConfigUI();
-    alert('Connecté à Supabase ! Synchronisation activée.');
-  } catch (error) {
-    console.error('Erreur connexion Supabase:', error);
-    alert('Erreur de connexion à Supabase: ' + error.message);
-  }
-}
-
 // Rendre les fonctions accessibles globalement pour les onclick HTML
 window.showConfigModal = showConfigModal;
 window.closeConfigModal = closeConfigModal;
-window.connectSupabase = connectSupabase;
+window.connectSupabasePreconfig = connectSupabasePreconfig;
+window.connectSupabaseManual = connectSupabaseManual;
+window.enableManualInput = enableManualInput;
 window.switchTab = switchTab;
 window.setFilter = setFilter;
 window.openModal = openModal;
@@ -574,7 +632,7 @@ window.quickEpisode = quickEpisode;
 window.toggleSeasons = toggleSeasons;
 window.saveEntry = saveEntry;
 window.addSeasonField = addSeasonField;
-window.removeSeasonField = removeSeasonField;
+window.removeSeasonField = removeSF;
 
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();

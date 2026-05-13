@@ -638,7 +638,12 @@
         <input class="form-input" id="supabase-key" type="password" readonly style="background:var(--surface2);color:var(--text-dim);">
       </div>
       
-      <button class="btn-primary" onclick="connectSupabase()">Se connecter à Supabase</button>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+        <button class="btn-primary" onclick="connectSupabasePreconfig()" style="flex:1;">Utiliser config pré-définie</button>
+        <button class="btn-secondary" onclick="enableManualInput()" style="flex:1;">Saisie manuelle</button>
+      </div>
+      
+      <button class="btn-primary" onclick="connectSupabaseManual()" id="btn-connect-manual" style="margin-top:0.5rem;display:none;width:100%;">Se connecter avec ces identifiants</button>
     </div>
 
     <div style="background:var(--surface2);border-radius:6px;padding:1rem;margin:1rem 0;font-size:0.75rem;color:var(--text-dim);">
