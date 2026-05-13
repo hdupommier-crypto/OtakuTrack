@@ -350,10 +350,6 @@ function renderStats() {
   }, 0);
   const tomesALire = DB.mangas.reduce((sum, m) => sum + (m.total - m.read), 0);
 
-  document.getElementById('hdr-eps').textContent = totalEpsWatched;
-  document.getElementById('hdr-tomes').textContent = totalTomesLus;
-  document.getElementById('hdr-time').textContent = formatTimeInteractive(totalTimeMin);
-
   if (currentTab === 'anime') {
     document.getElementById('stats-row').innerHTML = `
       <div class="stat-card">
