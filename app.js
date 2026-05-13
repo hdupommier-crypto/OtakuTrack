@@ -411,6 +411,8 @@ function renderAll() {
 function sortDataArray(data) {
   const arr = [...data];
   
+  if (currentSort === 'default' || currentSort === '') return arr;
+  
   switch (currentSort) {
     case 'alpha-asc':
       arr.sort((a, b) => a.title.localeCompare(b.title));
@@ -732,6 +734,7 @@ window.switchTab = switchTab;
 window.setFilter = setFilter;
 window.sortData = sortData;
 window.cycleTimeDisplay = cycleTimeDisplay;
+window.formatTimeInteractive = formatTimeInteractive;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.editEntry = editEntry;
