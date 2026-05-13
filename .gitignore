@@ -1,3 +1,4 @@
+```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -22,12 +23,11 @@ venv/
 *.log
 *.tmp
 *.swp
+*.swo
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # System files
 .DS_Store
@@ -71,3 +71,4 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+```

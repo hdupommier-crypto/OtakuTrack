@@ -623,42 +623,22 @@
     <h2>Configuration Sync</h2>
     
     <div style="margin-bottom:1.5rem;">
-      <div class="section-divider" style="margin-top:0;">Option 1: Supabase (Recommandé)</div>
-      <p style="font-size:0.75rem;color:var(--text-dim);margin:0.5rem 0 1rem;">
-        Synchronisation automatique en temps réel avec une base de données dédiée.
+      <p style="font-size:0.8rem;color:var(--text-dim);margin:0 0 1rem;">
+        Synchronisation automatique en temps réel avec Supabase.<br>
+        Vos données sont stockées dans votre base de données et accessibles depuis tous vos appareils.
       </p>
       
       <div class="form-group">
         <label>URL du projet Supabase</label>
-        <input class="form-input" id="supabase-url" type="text" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+        <input class="form-input" id="supabase-url" type="text" readonly style="background:var(--surface2);color:var(--text-dim);">
       </div>
       
       <div class="form-group">
         <label>Clé Anon/Public</label>
-        <input class="form-input" id="supabase-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off">
-        <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">
-          📖 Trouvez ces infos dans <a href="https://app.supabase.com" target="_blank" style="color:var(--accent);text-decoration:none;">votre dashboard Supabase</a> (Settings → API)
-        </div>
+        <input class="form-input" id="supabase-key" type="password" readonly style="background:var(--surface2);color:var(--text-dim);">
       </div>
       
-      <button class="btn-primary" onclick="connectSupabase()">Connecter Supabase</button>
-    </div>
-    
-    <div style="border-top:1px solid var(--border);padding-top:1.5rem;">
-      <div class="section-divider" style="margin-top:0;">Option 2: GitHub Gist</div>
-      <p style="font-size:0.75rem;color:var(--text-dim);margin:0.5rem 0 1rem;">
-        Alternative gratuite utilisant GitHub pour stocker les données.
-      </p>
-      
-      <div class="form-group">
-        <label>Token GitHub (Gist)</label>
-        <input class="form-input" id="config-token" type="password" placeholder="ghp_xxxxx..." autocomplete="off">
-        <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">
-          📖 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);text-decoration:none;">Créer un token</a> (permission: gist)
-        </div>
-      </div>
-      
-      <button class="btn-secondary" onclick="connectSync()" style="width:100%;">Connecter GitHub</button>
+      <button class="btn-primary" onclick="connectSupabase()">Se connecter à Supabase</button>
     </div>
 
     <div style="background:var(--surface2);border-radius:6px;padding:1rem;margin:1rem 0;font-size:0.75rem;color:var(--text-dim);">
