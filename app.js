@@ -649,8 +649,9 @@ async function connectSupabase() {
     return alert('URL et clé requises');
   }
   
-  SUPABASE_URL = url;
-  SUPABASE_ANON_KEY = key;
+  // Mettre à jour les variables globales
+  window.SUPABASE_URL = url;
+  window.SUPABASE_ANON_KEY = key;
   useSupabase = true;
   githubToken = null;
   gistId = null;
