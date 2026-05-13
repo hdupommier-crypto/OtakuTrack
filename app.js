@@ -1,8 +1,43 @@
 // ===== DATA LOADING =====
 let DB = { animes: [], mangas: [] };
 let dbLoaded = false;
+let supabaseClient = null;
+
+// Initialisation Supabase
+const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
+const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
+
+async function initSupabase() {
+  if (!window.supabase) {
+    console.error('Supabase JS non chargé');
+    return false;
+  }
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return true;
+}
 
 async function loadDatabase() {
+  // Essayer de charger depuis Supabase en premier
+  if (supabaseClient) {
+    try {
+      const { data: animes, error: err1 } = await supabaseClient.from('animes').select('*');
+      const { data: mangas, error: err2 } = await supabaseClient.from('mangas').select('*');
+      
+      if (!err1 && !err2) {
+        DB = { 
+          animes: animes || [], 
+          mangas: mangas || [] 
+        };
+        dbLoaded = true;
+        renderAll();
+        return;
+      }
+    } catch (error) {
+      console.log('Pas de données dans Supabase, utilisation du local');
+    }
+  }
+  
+  // Fallback: charger depuis db.json local
   try {
     const response = await fetch('db.json');
     if (!response.ok) throw new Error('Erreur chargement db.json');
@@ -23,6 +58,63 @@ let editingId = null;
 let modalType = 'anime';
 let githubToken = null;
 let gistId = null;
+let useSupabase = false;
+
+// ===== SUPABASE SYNC =====
+async function syncToSupabase() {
+  if (!supabaseClient || !useSupabase) return;
+  
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot syncing';
+  
+  try {
+    // Supprimer toutes les données existantes et réinsérer
+    await supabaseClient.from('animes').delete().neq('id', '');
+    await supabaseClient.from('mangas').delete().neq('id', '');
+    
+    // Insérer les nouvelles données
+    if (DB.animes.length > 0) {
+      await supabaseClient.from('animes').insert(DB.animes);
+    }
+    if (DB.mangas.length > 0) {
+      await supabaseClient.from('mangas').insert(DB.mangas);
+    }
+    
+    dot.className = 'sync-dot synced';
+    localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+  } catch (error) {
+    console.error('Erreur sync Supabase:', error);
+    dot.className = 'sync-dot';
+  }
+}
+
+async function syncFromSupabase() {
+  if (!supabaseClient || !useSupabase) return;
+  
+  try {
+    const { data: animes, error: err1 } = await supabaseClient.from('animes').select('*');
+    const { data: mangas, error: err2 } = await supabaseClient.from('mangas').select('*');
+    
+    if (!err1 && !err2) {
+      DB = { 
+        animes: animes || [], 
+        mangas: mangas || [] 
+      };
+      renderAll();
+      localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+    }
+  } catch (error) {
+    console.error('Erreur sync Supabase:', error);
+  }
+}
+
+async function syncData() {
+  if (useSupabase && supabaseClient) {
+    await syncToSupabase();
+  } else if (githubToken) {
+    await syncToGithub();
+  }
+}
 
 // ===== GITHUB SYNC =====
 function loadConfig() {
@@ -32,13 +124,14 @@ function loadConfig() {
       const config = JSON.parse(stored);
       githubToken = config.token || null;
       gistId = config.gistId || null;
+      useSupabase = config.useSupabase || false;
       updateSyncIndicator();
     } catch(e) {}
   }
 }
 
 function saveConfig() {
-  const config = { token: githubToken, gistId: gistId };
+  const config = { token: githubToken, gistId: gistId, useSupabase: useSupabase };
   localStorage.setItem('otakutrack-config', JSON.stringify(config));
 }
 
@@ -346,7 +439,7 @@ function quickUpdateManga(id, delta) {
   const m = DB.mangas.find(x => x.id === id);
   if (!m) return;
   m.read = Math.max(0, Math.min(m.total, m.read + delta));
-  syncToGithub();
+  syncData();
   renderAll();
 }
 
@@ -356,7 +449,7 @@ function quickEpisode(animeId, seasonIdx) {
   const se = a.seasons[seasonIdx];
   if (se.watched < se.eps) {
     se.watched++;
-    syncToGithub();
+    syncData();
     renderAll();
   }
 }
@@ -372,7 +465,7 @@ function deleteEntry(id) {
   if (!confirm('Supprimer cette entrée ?')) return;
   DB.animes = DB.animes.filter(x => x.id !== id);
   DB.mangas = DB.mangas.filter(x => x.id !== id);
-  syncToGithub();
+  syncData();
   renderAll();
 }
 
@@ -481,7 +574,7 @@ function saveEntry() {
       DB.mangas.push({ id: genId(), title, type: 'manga', total, read, notes });
     }
   }
-  syncToGithub();
+  syncData();
   closeModal();
   if (modalType !== currentTab) switchTab(modalType);
   renderAll();
@@ -501,8 +594,15 @@ function closeConfigModal() {
 
 function loadConfigUI() {
   document.getElementById('config-token').value = githubToken || '';
+  document.getElementById('supabase-url').value = SUPABASE_URL === 'https://VOTRE_PROJET.supabase.co' ? '' : SUPABASE_URL;
+  document.getElementById('supabase-key').value = SUPABASE_ANON_KEY === 'VOTRE_CLE_ANON' ? '' : SUPABASE_ANON_KEY;
   
-  const status = githubToken ? 'Connecté ✓' : 'Déconnecté';
+  let status = 'Déconnecté';
+  if (useSupabase && supabaseClient) {
+    status = 'Supabase ✓';
+  } else if (githubToken) {
+    status = 'GitHub ✓';
+  }
   document.getElementById('config-status').textContent = status;
   
   const lastSync = localStorage.getItem('otakutrack-lastsync');
@@ -517,11 +617,35 @@ async function connectSync() {
   if (!token) return alert('Veuillez entrer un token');
   
   githubToken = token;
+  useSupabase = false;
   saveConfig();
   updateSyncIndicator();
-  await syncToGithub();
+  await syncData();
   loadConfigUI();
   alert('Connecté ! Les données seront synchronisées.');
+}
+
+async function connectSupabase() {
+  const url = document.getElementById('supabase-url').value.trim();
+  const key = document.getElementById('supabase-key').value.trim();
+  if (!url || !key) return alert('URL et clé requises');
+  
+  SUPABASE_URL = url;
+  SUPABASE_ANON_KEY = key;
+  useSupabase = true;
+  githubToken = null;
+  gistId = null;
+  
+  const initialized = await initSupabase();
+  if (initialized) {
+    saveConfig();
+    updateSyncIndicator();
+    await syncData();
+    loadConfigUI();
+    alert('Connecté à Supabase ! Synchronisation activée.');
+  } else {
+    alert('Erreur de connexion à Supabase');
+  }
 }
 
 document.getElementById('modal').addEventListener('click', function(e) {
@@ -532,6 +656,16 @@ document.getElementById('config-modal').addEventListener('click', function(e) {
   if (e.target === this) closeConfigModal();
 });
 
+async function initApp() {
+  loadConfig();
+  
+  // Initialiser Supabase si configuré
+  if (useSupabase && SUPABASE_URL !== 'https://VOTRE_PROJET.supabase.co') {
+    await initSupabase();
+  }
+  
+  loadDatabase();
+}
+
 // ===== INIT =====
-loadConfig();
-loadDatabase();
+initApp();
