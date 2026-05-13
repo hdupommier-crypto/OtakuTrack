@@ -638,9 +638,16 @@ async function connectSync() {
 }
 
 async function connectSupabase() {
+  console.log('Début connexion Supabase...');
   const url = document.getElementById('supabase-url').value.trim();
   const key = document.getElementById('supabase-key').value.trim();
-  if (!url || !key) return alert('URL et clé requises');
+  console.log('URL:', url);
+  console.log('Clé:', key ? 'définie' : 'vide');
+  
+  if (!url || !key) {
+    console.log('URL ou clé manquante');
+    return alert('URL et clé requises');
+  }
   
   SUPABASE_URL = url;
   SUPABASE_ANON_KEY = key;
@@ -649,10 +656,18 @@ async function connectSupabase() {
   gistId = null;
   
   // Initialiser le client Supabase
+  console.log('Initialisation client Supabase...');
+  if (!window.supabase) {
+    console.error('Librairie Supabase non chargée!');
+    return alert('Erreur: Librairie Supabase non chargée. Vérifiez votre connexion internet.');
+  }
+  
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('Client Supabase créé');
   
   // Tester la connexion
   try {
+    console.log('Test de connexion...');
     const { data, error } = await supabaseClient.from('animes').select('*').limit(1);
     if (error && error.code !== 'PGRST102') {
       console.error('Erreur test Supabase:', error);
@@ -660,6 +675,7 @@ async function connectSupabase() {
       return;
     }
     
+    console.log('Connexion réussie, sauvegarde config...');
     saveConfig();
     updateSyncIndicator();
     await syncData();
