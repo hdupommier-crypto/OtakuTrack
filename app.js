@@ -147,9 +147,11 @@ async function loadDatabase() {
 // ===== STATE =====
 let currentTab = 'anime';
 let currentFilter = 'all';
+let currentSort = 'default';
 let editingId = null;
 let modalType = 'anime';
 let useSupabase = true;
+let timeDisplayMode = 0; // 0: jours, 1: heures, 2: minutes
 
 // ===== SUPABASE SYNC =====
 async function syncToSupabase() {
@@ -202,6 +204,8 @@ async function syncFromSupabase() {
 async function syncData() {
   if (useSupabase && supabaseClient) {
     await syncToSupabase();
+    // Recharger les données après synchronisation pour récupérer les timestamps
+    await syncFromSupabase();
   }
 }
 
@@ -267,6 +271,32 @@ function formatTime(mins) {
   return d + 'j ' + (rh > 0 ? rh + 'h' : '');
 }
 
+function formatTimeInteractive(mins) {
+  if (timeDisplayMode === 0) {
+    // Jours
+    if (mins < 60) return mins + 'min';
+    const h = Math.floor(mins/60);
+    if (h < 24) return h + 'h';
+    const d = Math.floor(h/24);
+    const rh = h % 24;
+    return d + 'j ' + (rh > 0 ? rh + 'h' : '');
+  } else if (timeDisplayMode === 1) {
+    // Heures
+    const h = Math.floor(mins/60);
+    const m = mins % 60;
+    return h + 'h ' + (m > 0 ? m + 'min' : '');
+  } else {
+    // Minutes
+    return mins + ' minutes';
+  }
+}
+
+function cycleTimeDisplay() {
+  timeDisplayMode = (timeDisplayMode + 1) % 3;
+  renderStats();
+  renderAll();
+}
+
 function badgeHTML(status) {
   const map = {
     'fini': ['badge-fini', '✓ Fini'],
@@ -290,49 +320,81 @@ function renderStats() {
   const totalTomesLus = DB.mangas.reduce((sum, m) => sum + m.read, 0);
   const animesTermines = DB.animes.filter(a => getStatus(a) === 'fini').length;
   const mangasTermines = DB.mangas.filter(m => getStatus(m) === 'fini').length;
+  
+  // Calculs pour les stats détaillées
+  const episodesAVoir = DB.animes.reduce((sum, a) => {
+    const total = a.seasons.reduce((s, se) => s + se.eps, 0);
+    const watched = a.seasons.reduce((s, se) => s + se.watched, 0);
+    return sum + (total - watched);
+  }, 0);
+  const tomesALire = DB.mangas.reduce((sum, m) => sum + (m.total - m.read), 0);
 
   document.getElementById('hdr-eps').textContent = totalEpsWatched;
   document.getElementById('hdr-tomes').textContent = totalTomesLus;
-  document.getElementById('hdr-time').textContent = formatTime(totalTimeMin);
+  document.getElementById('hdr-time').textContent = formatTimeInteractive(totalTimeMin);
 
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Épisodes vus</div>
-      <div class="stat-value accent">${totalEpsWatched}</div>
-      <div class="stat-sub">${formatTime(totalTimeMin)} de visionnage</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Animes terminés</div>
-      <div class="stat-value green">${animesTermines}</div>
-      <div class="stat-sub">sur ${DB.animes.length} titres</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Tomes lus</div>
-      <div class="stat-value purple">${totalTomesLus}</div>
-      <div class="stat-sub">manga</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Mangas terminés</div>
-      <div class="stat-value blue">${mangasTermines}</div>
-      <div class="stat-sub">sur ${DB.mangas.length} séries</div>
-    </div>
-  `;
+  if (currentTab === 'anime') {
+    document.getElementById('stats-row').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Épisodes vus</div>
+        <div class="stat-value accent">${totalEpsWatched}</div>
+        <div class="stat-sub">${formatTimeInteractive(totalTimeMin)} de visionnage</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Épisodes à voir</div>
+        <div class="stat-value blue">${episodesAVoir}</div>
+        <div class="stat-sub">restants</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Animes terminés</div>
+        <div class="stat-value green">${animesTermines}</div>
+        <div class="stat-sub">sur ${DB.animes.length} titres</div>
+      </div>
+      <div class="stat-card" style="cursor:pointer;" onclick="cycleTimeDisplay()" title="Cliquer pour changer l'unité">
+        <div class="stat-label">Temps de visionnage ⏱️</div>
+        <div class="stat-value purple">${formatTimeInteractive(totalTimeMin)}</div>
+        <div class="stat-sub">cliquer pour changer</div>
+      </div>
+    `;
+  } else {
+    document.getElementById('stats-row').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Tomes lus</div>
+        <div class="stat-value purple">${totalTomesLus}</div>
+        <div class="stat-sub">tomes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tomes à lire</div>
+        <div class="stat-value blue">${tomesALire}</div>
+        <div class="stat-sub">restants</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Mangas terminés</div>
+        <div class="stat-value green">${mangasTermines}</div>
+        <div class="stat-sub">sur ${DB.mangas.length} séries</div>
+      </div>
+    `;
+  }
 }
 
 function renderAll() {
   renderStats();
   const search = document.getElementById('search-input').value.toLowerCase();
-  const data = currentTab === 'anime' ? DB.animes : DB.mangas;
+  let data = currentTab === 'anime' ? DB.animes : DB.mangas;
 
   document.getElementById('pill-anime').textContent = DB.animes.length;
   document.getElementById('pill-manga').textContent = DB.mangas.length;
 
+  // Appliquer le filtre
   let filtered = data.filter(item => {
     const status = getStatus(item);
     if (currentFilter !== 'all' && status !== currentFilter) return false;
     if (search && !item.title.toLowerCase().includes(search)) return false;
     return true;
   });
+
+  // Appliquer le tri
+  filtered = sortDataArray(filtered);
 
   const grid = document.getElementById('grid');
   if (filtered.length === 0) {
@@ -344,6 +406,47 @@ function renderAll() {
   }
 
   grid.innerHTML = filtered.map(item => renderCard(item)).join('');
+}
+
+function sortDataArray(data) {
+  const arr = [...data];
+  
+  switch (currentSort) {
+    case 'alpha-asc':
+      arr.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case 'alpha-desc':
+      arr.sort((a, b) => b.title.localeCompare(a.title));
+      break;
+    case 'recent':
+      arr.sort((a, b) => {
+        const timeA = a.lastModified || 0;
+        const timeB = b.lastModified || 0;
+        return timeB - timeA;
+      });
+      break;
+    case 'progress':
+      arr.sort((a, b) => getProgress(b) - getProgress(a));
+      break;
+    case 'duration':
+      arr.sort((a, b) => {
+        if (a.type === 'anime') {
+          const durA = a.seasons.reduce((s, se) => s + se.eps * se.epDur, 0);
+          const durB = b.seasons.reduce((s, se) => s + se.eps * se.epDur, 0);
+          return durB - durA;
+        } else {
+          return (b.total || 0) - (a.total || 0);
+        }
+      });
+      break;
+  }
+  
+  return arr;
+}
+
+function sortData() {
+  currentSort = document.getElementById('sort-select').value;
+  renderAll();
 }
 
 function renderCard(item) {
@@ -445,6 +548,7 @@ function quickUpdateManga(id, delta) {
   const m = DB.mangas.find(x => x.id === id);
   if (!m) return;
   m.read = Math.max(0, Math.min(m.total, m.read + delta));
+  m.lastModified = Date.now();
   syncData();
   renderAll();
 }
@@ -455,6 +559,7 @@ function quickEpisode(animeId, seasonIdx) {
   const se = a.seasons[seasonIdx];
   if (se.watched < se.eps) {
     se.watched++;
+    a.lastModified = Date.now();
     syncData();
     renderAll();
   }
@@ -552,6 +657,8 @@ function removeSF(idx) {
 }
 
 function saveEntry() {
+  const now = Date.now();
+  
   if (modalType === 'anime') {
     const title = document.getElementById('m-title').value.trim();
     if (!title) return alert('Titre requis');
@@ -563,9 +670,9 @@ function saveEntry() {
     }));
     if (editingId) {
       const a = DB.animes.find(x => x.id === editingId);
-      if (a) { a.title = title; a.seasons = seasons; }
+      if (a) { a.title = title; a.seasons = seasons; a.lastModified = now; }
     } else {
-      DB.animes.push({ id: genId(), title, type: 'anime', seasons });
+      DB.animes.push({ id: genId(), title, type: 'anime', seasons, lastModified: now });
     }
   } else {
     const title = document.getElementById('m-manga-title').value.trim();
@@ -575,9 +682,9 @@ function saveEntry() {
     if (!title) return alert('Titre requis');
     if (editingId) {
       const m = DB.mangas.find(x => x.id === editingId);
-      if (m) { m.title = title; m.total = total; m.read = read; m.notes = notes; }
+      if (m) { m.title = title; m.total = total; m.read = read; m.notes = notes; m.lastModified = now; }
     } else {
-      DB.mangas.push({ id: genId(), title, type: 'manga', total, read, notes });
+      DB.mangas.push({ id: genId(), title, type: 'manga', total, read, notes, lastModified: now });
     }
   }
   syncData();
@@ -623,6 +730,8 @@ window.connectSupabaseManual = connectSupabaseManual;
 window.enableManualInput = enableManualInput;
 window.switchTab = switchTab;
 window.setFilter = setFilter;
+window.sortData = sortData;
+window.cycleTimeDisplay = cycleTimeDisplay;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.editEntry = editEntry;
