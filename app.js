@@ -4,8 +4,8 @@ let dbLoaded = false;
 let supabaseClient = null;
 
 // Initialisation Supabase
-const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
-const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
+let SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
+let SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
 
 async function initSupabase() {
   if (!window.supabase) {
@@ -125,20 +125,32 @@ function loadConfig() {
       githubToken = config.token || null;
       gistId = config.gistId || null;
       useSupabase = config.useSupabase || false;
+      // Charger les identifiants Supabase s'ils existent
+      if (config.supabaseUrl) SUPABASE_URL = config.supabaseUrl;
+      if (config.supabaseKey) SUPABASE_ANON_KEY = config.supabaseKey;
       updateSyncIndicator();
     } catch(e) {}
   }
 }
 
 function saveConfig() {
-  const config = { token: githubToken, gistId: gistId, useSupabase: useSupabase };
+  const config = { 
+    token: githubToken, 
+    gistId: gistId, 
+    useSupabase: useSupabase,
+    supabaseUrl: SUPABASE_URL !== 'https://VOTRE_PROJET.supabase.co' ? SUPABASE_URL : null,
+    supabaseKey: SUPABASE_ANON_KEY !== 'VOTRE_CLE_ANON' ? SUPABASE_ANON_KEY : null
+  };
   localStorage.setItem('otakutrack-config', JSON.stringify(config));
 }
 
 function updateSyncIndicator() {
   const dot = document.getElementById('sync-dot');
   const text = document.getElementById('sync-text');
-  if (githubToken) {
+  if (useSupabase && supabaseClient) {
+    dot.className = 'sync-dot synced';
+    text.textContent = 'Supabase';
+  } else if (githubToken) {
     dot.className = 'sync-dot synced';
     text.textContent = 'Connecté';
   } else {
@@ -636,15 +648,26 @@ async function connectSupabase() {
   githubToken = null;
   gistId = null;
   
-  const initialized = await initSupabase();
-  if (initialized) {
+  // Initialiser le client Supabase
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+  // Tester la connexion
+  try {
+    const { data, error } = await supabaseClient.from('animes').select('*').limit(1);
+    if (error && error.code !== 'PGRST102') {
+      console.error('Erreur test Supabase:', error);
+      alert('Erreur de connexion à Supabase: ' + error.message);
+      return;
+    }
+    
     saveConfig();
     updateSyncIndicator();
     await syncData();
     loadConfigUI();
     alert('Connecté à Supabase ! Synchronisation activée.');
-  } else {
-    alert('Erreur de connexion à Supabase');
+  } catch (error) {
+    console.error('Erreur connexion Supabase:', error);
+    alert('Erreur de connexion à Supabase: ' + error.message);
   }
 }
 
@@ -661,7 +684,8 @@ async function initApp() {
   
   // Initialiser Supabase si configuré
   if (useSupabase && SUPABASE_URL !== 'https://VOTRE_PROJET.supabase.co') {
-    await initSupabase();
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    updateSyncIndicator();
   }
   
   loadDatabase();
