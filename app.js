@@ -671,6 +671,24 @@ async function connectSupabase() {
   }
 }
 
+// Rendre les fonctions accessibles globalement pour les onclick HTML
+window.showConfigModal = showConfigModal;
+window.closeConfigModal = closeConfigModal;
+window.connectSupabase = connectSupabase;
+window.connectSync = connectSync;
+window.switchTab = switchTab;
+window.setFilter = setFilter;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.editEntry = editEntry;
+window.deleteEntry = deleteEntry;
+window.quickUpdateManga = quickUpdateManga;
+window.quickEpisode = quickEpisode;
+window.toggleSeasons = toggleSeasons;
+window.saveEntry = saveEntry;
+window.addSeasonField = addSeasonField;
+window.removeSeasonField = removeSeasonField;
+
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
