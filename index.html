@@ -560,6 +560,14 @@
 
   <div class="filters">
     <input class="search-box" type="text" placeholder="Rechercher..." id="search-input" oninput="renderAll()">
+    <select id="sort-select" onchange="sortData()" style="margin-left: 10px; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); font-family: inherit; font-size: 0.8rem; cursor: pointer;">
+      <option value="default">Tri : Défaut</option>
+      <option value="alpha-asc">A-Z</option>
+      <option value="alpha-desc">Z-A</option>
+      <option value="recent">Dernière modif</option>
+      <option value="progress">Progression</option>
+      <option value="duration">Durée/Volume</option>
+    </select>
     <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">Tout</button>
     <button class="filter-btn" onclick="setFilter('fini')" id="filter-fini">✓ Finis</button>
     <button class="filter-btn" onclick="setFilter('en-cours')" id="filter-en-cours">⟳ En cours</button>
