@@ -3,9 +3,9 @@ let DB = { animes: [], mangas: [] };
 let dbLoaded = false;
 let supabaseClient = null;
 
-// Initialisation Supabase
-let SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
-let SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
+// Configuration Supabase (pré-remplie)
+const SUPABASE_URL = 'https://alzbwiqgoaosyohwiakr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsemJ3aXFnb2Fvc3lvaHdpYWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODM3MTQsImV4cCI6MjA5NDI1OTcxNH0.s7CwqRz4DKdtZAlNQ9Yw5iaahS_LE52gsMlxSeZo_ys';
 
 async function initSupabase() {
   if (!window.supabase) {
@@ -56,9 +56,7 @@ let currentTab = 'anime';
 let currentFilter = 'all';
 let editingId = null;
 let modalType = 'anime';
-let githubToken = null;
-let gistId = null;
-let useSupabase = false;
+let useSupabase = true;
 
 // ===== SUPABASE SYNC =====
 async function syncToSupabase() {
@@ -111,36 +109,22 @@ async function syncFromSupabase() {
 async function syncData() {
   if (useSupabase && supabaseClient) {
     await syncToSupabase();
-  } else if (githubToken) {
-    await syncToGithub();
   }
 }
 
-// ===== GITHUB SYNC =====
 function loadConfig() {
   const stored = localStorage.getItem('otakutrack-config');
   if (stored) {
     try {
       const config = JSON.parse(stored);
-      githubToken = config.token || null;
-      gistId = config.gistId || null;
-      useSupabase = config.useSupabase || false;
-      // Charger les identifiants Supabase s'ils existent
-      if (config.supabaseUrl) SUPABASE_URL = config.supabaseUrl;
-      if (config.supabaseKey) SUPABASE_ANON_KEY = config.supabaseKey;
+      useSupabase = config.useSupabase !== false;
       updateSyncIndicator();
     } catch(e) {}
   }
 }
 
 function saveConfig() {
-  const config = { 
-    token: githubToken, 
-    gistId: gistId, 
-    useSupabase: useSupabase,
-    supabaseUrl: SUPABASE_URL !== 'https://VOTRE_PROJET.supabase.co' ? SUPABASE_URL : null,
-    supabaseKey: SUPABASE_ANON_KEY !== 'VOTRE_CLE_ANON' ? SUPABASE_ANON_KEY : null
-  };
+  const config = { useSupabase: useSupabase };
   localStorage.setItem('otakutrack-config', JSON.stringify(config));
 }
 
@@ -150,92 +134,9 @@ function updateSyncIndicator() {
   if (useSupabase && supabaseClient) {
     dot.className = 'sync-dot synced';
     text.textContent = 'Supabase';
-  } else if (githubToken) {
-    dot.className = 'sync-dot synced';
-    text.textContent = 'Connecté';
   } else {
     dot.className = 'sync-dot';
     text.textContent = 'Local';
-  }
-}
-
-async function syncToGithub() {
-  if (!githubToken) return;
-  
-  const dot = document.getElementById('sync-dot');
-  dot.className = 'sync-dot syncing';
-  
-  try {
-    if (!gistId) {
-      const response = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({
-          description: 'OtakuTrack Data',
-          public: false,
-          files: {
-            'otakutrack.json': {
-              content: JSON.stringify(DB, null, 2)
-            }
-          }
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        gistId = data.id;
-        saveConfig();
-      }
-    } else {
-      await fetch(`https://api.github.com/gists/${gistId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({
-          files: {
-            'otakutrack.json': {
-              content: JSON.stringify(DB, null, 2)
-            }
-          }
-        })
-      });
-    }
-    
-    dot.className = 'sync-dot synced';
-    localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
-  } catch (error) {
-    console.error('Erreur sync:', error);
-    dot.className = 'sync-dot';
-  }
-}
-
-async function syncFromGithub() {
-  if (!githubToken || !gistId) return;
-  
-  try {
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-      headers: {
-        'Authorization': `token ${githubToken}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      const file = data.files['otakutrack.json'];
-      if (file) {
-        DB = JSON.parse(file.content);
-        renderAll();
-        localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
-      }
-    }
-  } catch (error) {
-    console.error('Erreur sync:', error);
   }
 }
 
@@ -605,15 +506,12 @@ function closeConfigModal() {
 }
 
 function loadConfigUI() {
-  document.getElementById('config-token').value = githubToken || '';
-  document.getElementById('supabase-url').value = SUPABASE_URL === 'https://VOTRE_PROJET.supabase.co' ? '' : SUPABASE_URL;
-  document.getElementById('supabase-key').value = SUPABASE_ANON_KEY === 'VOTRE_CLE_ANON' ? '' : SUPABASE_ANON_KEY;
+  document.getElementById('supabase-url').value = SUPABASE_URL;
+  document.getElementById('supabase-key').value = SUPABASE_ANON_KEY;
   
   let status = 'Déconnecté';
   if (useSupabase && supabaseClient) {
     status = 'Supabase ✓';
-  } else if (githubToken) {
-    status = 'GitHub ✓';
   }
   document.getElementById('config-status').textContent = status;
   
@@ -624,37 +522,10 @@ function loadConfigUI() {
   }
 }
 
-async function connectSync() {
-  const token = document.getElementById('config-token').value.trim();
-  if (!token) return alert('Veuillez entrer un token');
-  
-  githubToken = token;
-  useSupabase = false;
-  saveConfig();
-  updateSyncIndicator();
-  await syncData();
-  loadConfigUI();
-  alert('Connecté ! Les données seront synchronisées.');
-}
-
 async function connectSupabase() {
-  console.log('Début connexion Supabase...');
-  const url = document.getElementById('supabase-url').value.trim();
-  const key = document.getElementById('supabase-key').value.trim();
-  console.log('URL:', url);
-  console.log('Clé:', key ? 'définie' : 'vide');
+  console.log('Connexion Supabase avec identifiants pré-configurés...');
   
-  if (!url || !key) {
-    console.log('URL ou clé manquante');
-    return alert('URL et clé requises');
-  }
-  
-  // Mettre à jour les variables globales
-  window.SUPABASE_URL = url;
-  window.SUPABASE_ANON_KEY = key;
   useSupabase = true;
-  githubToken = null;
-  gistId = null;
   
   // Initialiser le client Supabase
   console.log('Initialisation client Supabase...');
@@ -692,7 +563,6 @@ async function connectSupabase() {
 window.showConfigModal = showConfigModal;
 window.closeConfigModal = closeConfigModal;
 window.connectSupabase = connectSupabase;
-window.connectSync = connectSync;
 window.switchTab = switchTab;
 window.setFilter = setFilter;
 window.openModal = openModal;
@@ -717,11 +587,10 @@ document.getElementById('config-modal').addEventListener('click', function(e) {
 async function initApp() {
   loadConfig();
   
-  // Initialiser Supabase si configuré
-  if (useSupabase && SUPABASE_URL !== 'https://VOTRE_PROJET.supabase.co') {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    updateSyncIndicator();
-  }
+  // Initialiser Supabase automatiquement avec les identifiants pré-configurés
+  useSupabase = true;
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  updateSyncIndicator();
   
   loadDatabase();
 }
