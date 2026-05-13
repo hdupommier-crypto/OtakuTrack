@@ -71,16 +71,6 @@
     gap: 2rem;
   }
 
-  .header-stats {
-    display: flex;
-    gap: 2rem;
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .header-stats strong { color: var(--text); font-size: 1.1rem; display: block; font-weight: 700; }
-
   .sync-indicator {
     display: flex;
     align-items: center;
@@ -512,7 +502,6 @@
   @media (max-width: 600px) {
     main { padding: 1rem; }
     .grid { grid-template-columns: 1fr; }
-    .header-stats { display: none; }
     .header-right { flex-direction: column; gap: 0.5rem; }
   }
 </style>
@@ -524,20 +513,6 @@
     <span class="logo">OtakuTrack<span>mon suivi</span></span>
   </div>
   <div class="header-right">
-    <div class="header-stats">
-      <div>
-        <strong id="hdr-eps">—</strong>
-        épisodes vus
-      </div>
-      <div>
-        <strong id="hdr-tomes">—</strong>
-        tomes lus
-      </div>
-      <div>
-        <strong id="hdr-time">—</strong>
-        temps total
-      </div>
-    </div>
     <div class="sync-indicator" id="sync-indicator" onclick="showConfigModal()">
       <span class="sync-dot synced" id="sync-dot"></span>
       <span id="sync-text">Local</span>
@@ -667,6 +642,12 @@
     </div>
   </div>
 </div>
+
+<footer style="position:fixed;bottom:10px;right:15px;font-size:0.7rem;color:var(--text-dim);display:flex;align-items:center;gap:8px;z-index:99;">
+  <a href="https://github.com/hdupommier-crypto/OtakuTrack" target="_blank" rel="noopener noreferrer" style="color:var(--text-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">By Hopcraft</a>
+  <span style="opacity:0.5;">|</span>
+  <span id="version-badge" style="font-weight:700;color:var(--accent);">v1.0.9</span>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
