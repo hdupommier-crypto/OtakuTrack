@@ -154,65 +154,47 @@ let useSupabase = true;
 let timeDisplayMode = 0; // 0: jours, 1: heures, 2: minutes
 let viewMode = 'condensed'; // 'condensed' or 'expanded'
 
-// ===== SUPABASE SYNC =====
+// ===== SUPABASE SYNC (SIMPLIFIÉ SANS lastModified) =====
 async function syncToSupabase() {
   if (!supabaseClient || !useSupabase) return;
-  
+
   const dot = document.getElementById('sync-dot');
   dot.className = 'sync-dot syncing';
-  
+
   try {
-    // SÉCURITÉ CRITIQUE : Ne jamais synchroniser si les tableaux sont vides
-    // Cela empêche d'effacer la base de données par accident
     if (DB.animes.length === 0 && DB.mangas.length === 0) {
-      console.warn('⚠️ TENTATIVE DE SYNCHRONISATION VIDE BLOQUÉE ! Les données locales sont vides, on annule pour protéger la DB.');
+      console.warn('⚠️ SYNCHRONISATION VIDE BLOQUÉE !');
       dot.className = 'sync-dot error';
       showNotification('Synchronisation annulée: Données locales vides', 'error');
       return;
     }
 
-    // Utiliser upsert au lieu de delete+insert pour éviter les pertes de données
-    // Upsert met à jour les lignes existantes et ajoute les nouvelles sans toucher aux autres
-    // Préparer les données pour Supabase en mappant lastModified -> updated_at
-    const animesForSupabase = DB.animes.map(({ lastModified, ...rest }) => ({
-      ...rest,
-      updated_at: lastModified || Date.now()
-    }));
+    // Envoyer les données SANS lastModified
+    const animesForSupabase = DB.animes.map(({ lastModified, ...rest }) => rest);
+    const mangasForSupabase = DB.mangas.map(({ lastModified, ...rest }) => rest);
 
-    const mangasForSupabase = DB.mangas.map(({ lastModified, ...rest }) => ({
-      ...rest,
-      updated_at: lastModified || Date.now()
-    }));
-
-    // Utiliser upsert au lieu de delete+insert pour éviter les pertes de données
     if (animesForSupabase.length > 0) {
-      console.log(`Sauvegarde de ${animesForSupabase.length} animes...`);
       const { error: animeError } = await supabaseClient
         .from('animes')
         .upsert(animesForSupabase, { onConflict: 'id' });
-      
       if (animeError) throw animeError;
     }
 
     if (mangasForSupabase.length > 0) {
-      console.log(`Sauvegarde de ${mangasForSupabase.length} mangas...`);
       const { error: mangaError } = await supabaseClient
         .from('mangas')
         .upsert(mangasForSupabase, { onConflict: 'id' });
-      
       if (mangaError) throw mangaError;
     }
-    
+
     dot.className = 'sync-dot synced';
     localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
-    console.log('✅ Synchronisation réussie et sécurisée');
+    console.log('✅ Synchronisation réussie');
     showNotification('Données synchronisées avec succès', 'success');
   } catch (error) {
-    console.error('❌ Erreur critique sync Supabase:', error);
+    console.error('❌ Erreur sync Supabase:', error);
     dot.className = 'sync-dot error';
     showNotification('Erreur de synchronisation: ' + error.message, 'error');
-    // En cas d'erreur, on recharge les données depuis Supabase pour éviter toute perte
-    await syncFromSupabase();
   }
 }
 
@@ -224,24 +206,13 @@ async function syncFromSupabase() {
     const { data: mangas, error: err2 } = await supabaseClient.from('mangas').select('*');
 
     if (!err1 && !err2) {
-      // Mapper updated_at -> lastModified pour la cohérence locale
-      const animesMapped = (animes || []).map(({ updated_at, ...rest }) => ({
-        ...rest,
-        lastModified: updated_at || Date.now()
-      }));
-      
-      const mangasMapped = (mangas || []).map(({ updated_at, ...rest }) => ({
-        ...rest,
-        lastModified: updated_at || Date.now()
-      }));
-      
       DB = {
-        animes: animesMapped,
-        mangas: mangasMapped
+        animes: animes || [],
+        mangas: mangas || []
       };
       renderAll();
       localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
-      console.log('✅ Données chargées depuis Supabase avec mapping updated_at -> lastModified');
+      console.log('✅ Données chargées depuis Supabase');
     }
   } catch (error) {
     console.error('Erreur sync Supabase:', error);
