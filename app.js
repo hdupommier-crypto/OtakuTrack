@@ -194,6 +194,7 @@ async function syncToSupabase() {
     dot.className = 'sync-dot synced';
     localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
     console.log('✅ Synchronisation réussie et sécurisée');
+    showNotification('Données synchronisées avec succès', 'success');
   } catch (error) {
     console.error('❌ Erreur critique sync Supabase:', error);
     dot.className = 'sync-dot error';
@@ -257,6 +258,51 @@ function updateSyncIndicator() {
     dot.className = 'sync-dot';
     text.textContent = 'Local';
   }
+}
+
+// ===== NOTIFICATIONS =====
+function showNotification(message, type = 'info') {
+  // Créer une notification toast
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    background: ${type === 'error' ? 'var(--accent)' : type === 'success' ? 'var(--green)' : 'var(--blue)'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+    max-width: 350px;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // Ajouter l'animation via CSS injecté
+  if (!document.getElementById('toast-styles')) {
+    const style = document.createElement('style');
+    style.id = 'toast-styles';
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Supprimer après 3 secondes
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // ===== UTILS =====
@@ -692,7 +738,12 @@ function openModal(id = null) {
       // Nettoyer la liste des saisons avant de remplir pour éviter les doublons
       document.getElementById('seasons-list').innerHTML = '';
       seasonFields = [];
-      item.seasons.forEach(se => addSeasonField(se));
+      if (item.seasons && item.seasons.length > 0) {
+        item.seasons.forEach(se => addSeasonField(se));
+      } else {
+        // Si aucune saison, ajouter une saison vide par défaut
+        addSeasonField();
+      }
     } else {
       document.getElementById('m-manga-title').value = item.title;
       document.getElementById('m-total').value = item.total;
@@ -728,6 +779,9 @@ function selectModalType(type) {
 }
 
 function addSeasonField(se = null) {
+  // Ne pas ajouter de saison vide si on édite et qu'il n'y a pas de données
+  if (!se && editingId && seasonFields.length === 0) return;
+  
   const idx = seasonFields.length;
   seasonFields.push(se || { name:'', eps:12, watched:0, epDur:20 });
   const list = document.getElementById('seasons-list');
