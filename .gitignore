@@ -1,1 +1,5 @@
-Nothing should be ignored based on the provided file changes. The changes only include source files (.js, .html) without any build artifacts, dependencies, or temporary files that would warrant adding to .gitignore.
+```
+# Logs and temp files
+*.log
+server.log
+```
