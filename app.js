@@ -461,6 +461,14 @@ function renderAll() {
   filtered = sortDataArray(filtered);
 
   const grid = document.getElementById('grid');
+  
+  // Appliquer la classe expanded-view si en mode déployé
+  if (viewMode === 'expanded') {
+    grid.classList.add('expanded-view');
+  } else {
+    grid.classList.remove('expanded-view');
+  }
+  
   if (filtered.length === 0) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
       <div class="icon">📭</div>
@@ -711,6 +719,20 @@ function setViewMode(mode) {
   viewMode = mode;
   document.getElementById('view-condensed').classList.toggle('active', mode === 'condensed');
   document.getElementById('view-expanded').classList.toggle('active', mode === 'expanded');
+  
+  // Appliquer la classe expanded-view à la grille en mode déployé
+  const grid = document.getElementById('grid');
+  if (grid) {
+    if (mode === 'expanded') {
+      grid.classList.add('expanded-view');
+    } else {
+      grid.classList.remove('expanded-view');
+    }
+  }
+  
+  // Sauvegarder la préférence utilisateur
+  localStorage.setItem('otakutrack-viewmode', mode);
+  
   renderAll();
 }
 
@@ -896,6 +918,7 @@ window.toggleSeasons = toggleSeasons;
 window.saveEntry = saveEntry;
 window.addSeasonField = addSeasonField;
 window.removeSeasonField = removeSF;
+window.removeSF = removeSF;
 window.setViewMode = setViewMode;
 
 document.getElementById('modal').addEventListener('click', function(e) {
@@ -908,6 +931,12 @@ document.getElementById('config-modal').addEventListener('click', function(e) {
 
 async function initApp() {
   loadConfig();
+  
+  // Charger le mode de vue depuis localStorage
+  const savedViewMode = localStorage.getItem('otakutrack-viewmode');
+  if (savedViewMode) {
+    viewMode = savedViewMode;
+  }
   
   // Initialiser Supabase automatiquement avec les identifiants pré-configurés
   useSupabase = true;
