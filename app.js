@@ -173,20 +173,32 @@ async function syncToSupabase() {
 
     // Utiliser upsert au lieu de delete+insert pour éviter les pertes de données
     // Upsert met à jour les lignes existantes et ajoute les nouvelles sans toucher aux autres
-    if (DB.animes.length > 0) {
-      console.log(`Sauvegarde de ${DB.animes.length} animes...`);
+    // Préparer les données pour Supabase en mappant lastModified -> updated_at
+    const animesForSupabase = DB.animes.map(({ lastModified, ...rest }) => ({
+      ...rest,
+      updated_at: lastModified || Date.now()
+    }));
+
+    const mangasForSupabase = DB.mangas.map(({ lastModified, ...rest }) => ({
+      ...rest,
+      updated_at: lastModified || Date.now()
+    }));
+
+    // Utiliser upsert au lieu de delete+insert pour éviter les pertes de données
+    if (animesForSupabase.length > 0) {
+      console.log(`Sauvegarde de ${animesForSupabase.length} animes...`);
       const { error: animeError } = await supabaseClient
         .from('animes')
-        .upsert(DB.animes, { onConflict: 'id' });
+        .upsert(animesForSupabase, { onConflict: 'id' });
       
       if (animeError) throw animeError;
     }
 
-    if (DB.mangas.length > 0) {
-      console.log(`Sauvegarde de ${DB.mangas.length} mangas...`);
+    if (mangasForSupabase.length > 0) {
+      console.log(`Sauvegarde de ${mangasForSupabase.length} mangas...`);
       const { error: mangaError } = await supabaseClient
         .from('mangas')
-        .upsert(DB.mangas, { onConflict: 'id' });
+        .upsert(mangasForSupabase, { onConflict: 'id' });
       
       if (mangaError) throw mangaError;
     }
@@ -206,18 +218,30 @@ async function syncToSupabase() {
 
 async function syncFromSupabase() {
   if (!supabaseClient || !useSupabase) return;
-  
+
   try {
     const { data: animes, error: err1 } = await supabaseClient.from('animes').select('*');
     const { data: mangas, error: err2 } = await supabaseClient.from('mangas').select('*');
-    
+
     if (!err1 && !err2) {
-      DB = { 
-        animes: animes || [], 
-        mangas: mangas || [] 
+      // Mapper updated_at -> lastModified pour la cohérence locale
+      const animesMapped = (animes || []).map(({ updated_at, ...rest }) => ({
+        ...rest,
+        lastModified: updated_at || Date.now()
+      }));
+      
+      const mangasMapped = (mangas || []).map(({ updated_at, ...rest }) => ({
+        ...rest,
+        lastModified: updated_at || Date.now()
+      }));
+      
+      DB = {
+        animes: animesMapped,
+        mangas: mangasMapped
       };
       renderAll();
       localStorage.setItem('otakutrack-lastsync', new Date().toISOString());
+      console.log('✅ Données chargées depuis Supabase avec mapping updated_at -> lastModified');
     }
   } catch (error) {
     console.error('Erreur sync Supabase:', error);
