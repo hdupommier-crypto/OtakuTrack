@@ -152,6 +152,7 @@ let editingId = null;
 let modalType = 'anime';
 let useSupabase = true;
 let timeDisplayMode = 0; // 0: jours, 1: heures, 2: minutes
+let viewMode = 'condensed'; // 'condensed' or 'expanded'
 
 // ===== SUPABASE SYNC =====
 async function syncToSupabase() {
@@ -472,10 +473,42 @@ function renderCard(item) {
   const status = getStatus(item);
   const progress = getProgress(item);
   const color = item.type === 'manga' ? 'var(--manga)' : 'var(--anime)';
+  const isExpanded = viewMode === 'expanded';
+  
+  // Get poster image URL (using placeholder if not set)
+  const posterUrl = item.poster || `https://via.placeholder.com/140x200/1a1a26/8888aa?text=${encodeURIComponent(item.title.substring(0, 2).toUpperCase())}`;
 
   if (item.type === 'manga') {
     const pct = Math.round(progress * 100);
-    return `<div class="card" style="--card-color:${color}">
+    const cardClass = isExpanded ? 'card expanded' : 'card';
+    
+    if (isExpanded) {
+      return `<div class="${cardClass}" style="--card-color:${color}">
+        <img class="card-poster" src="${posterUrl}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/140x200/1a1a26/8888aa?text=NO+IMG'">
+        <div class="card-content">
+          <div class="card-header">
+            <div class="card-title">${item.title}</div>
+            ${badgeHTML(status)}
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>Tomes lus</span>
+              <strong>${item.read} / ${item.total}</strong>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div style="text-align:right;font-size:0.7rem;color:var(--text-dim);margin-top:2px;">${pct}%</div>
+          </div>
+          ${item.notes ? `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">📝 ${item.notes}</div>` : ''}
+          <div class="card-actions">
+            ${item.read < item.total ? `<button class="btn-sm" onclick="quickUpdateManga('${item.id}',1)">+1 tome</button>` : ''}
+            <button class="btn-sm" onclick="editEntry('${item.id}')">Modifier</button>
+            <button class="btn-sm danger" onclick="deleteEntry('${item.id}')">Supprimer</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    
+    return `<div class="${cardClass}" style="--card-color:${color}">
       <div class="card-header">
         <div class="card-title">${item.title}</div>
         ${badgeHTML(status)}
@@ -486,6 +519,7 @@ function renderCard(item) {
           <strong>${item.read} / ${item.total}</strong>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div style="text-align:right;font-size:0.7rem;color:var(--text-dim);margin-top:2px;">${pct}%</div>
       </div>
       ${item.notes ? `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">📝 ${item.notes}</div>` : ''}
       <div class="card-actions">
@@ -519,7 +553,42 @@ function renderCard(item) {
   const notStartedCount = item.seasons.filter(se => se.watched === 0 && se.eps > 0).length;
   const toggleLabel = item.seasons.length === 1 ? '1 saison' : `${item.seasons.length} saisons`;
 
-  return `<div class="card" style="--card-color:${color}">
+  const cardClass = isExpanded ? 'card expanded' : 'card';
+  
+  if (isExpanded) {
+    return `<div class="${cardClass}" style="--card-color:${color}">
+      <img class="card-poster" src="${posterUrl}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/140x200/1a1a26/8888aa?text=NO+IMG'">
+      <div class="card-content">
+        <div class="card-header">
+          <div class="card-title">${item.title}</div>
+          ${badgeHTML(status)}
+        </div>
+        ${item.seasons.length > 0 ? `
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Épisodes</span>
+            <strong>${watchedEps} / ${totalEps} · ${formatTime(totalTime)}</strong>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div style="text-align:right;font-size:0.7rem;color:var(--text-dim);margin-top:2px;">${pct}%</div>
+        </div>
+        <div class="seasons-toggle" onclick="toggleSeasons('${item.id}', this)" id="toggle-${item.id}">
+          <span class="toggle-arrow">&#9654;</span>
+          <span>${toggleLabel}</span>
+          ${inProgressCount > 0 ? `<span style="color:var(--accent2);font-size:0.68rem;">&middot; ${inProgressCount} en cours</span>` : ''}
+          ${notStartedCount > 0 && inProgressCount === 0 ? `<span style="color:var(--text-dim);font-size:0.68rem;">&middot; ${notStartedCount} à voir</span>` : ''}
+        </div>
+        <div class="seasons-detail" id="detail-${item.id}">${seasonsDetailHTML}</div>`
+        : `<div class="card-subtitle" style="margin-top:0.5rem">Aucune saison renseignée</div>`}
+        <div class="card-actions">
+          <button class="btn-sm" onclick="editEntry('${item.id}')">Modifier</button>
+          <button class="btn-sm danger" onclick="deleteEntry('${item.id}')">Supprimer</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="${cardClass}" style="--card-color:${color}">
     <div class="card-header">
       <div class="card-title">${item.title}</div>
       ${badgeHTML(status)}
@@ -531,12 +600,13 @@ function renderCard(item) {
         <strong>${watchedEps} / ${totalEps} · ${formatTime(totalTime)}</strong>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div style="text-align:right;font-size:0.7rem;color:var(--text-dim);margin-top:2px;">${pct}%</div>
     </div>
     <div class="seasons-toggle" onclick="toggleSeasons('${item.id}', this)" id="toggle-${item.id}">
       <span class="toggle-arrow">&#9654;</span>
       <span>${toggleLabel}</span>
       ${inProgressCount > 0 ? `<span style="color:var(--accent2);font-size:0.68rem;">&middot; ${inProgressCount} en cours</span>` : ''}
-      ${notStartedCount > 0 && inProgressCount === 0 ? `<span style="color:var(--text-dim);font-size:0.68rem;">&middot; ${notStartedCount} &agrave; voir</span>` : ''}
+      ${notStartedCount > 0 && inProgressCount === 0 ? `<span style="color:var(--text-dim);font-size:0.68rem;">&middot; ${notStartedCount} à voir</span>` : ''}
     </div>
     <div class="seasons-detail" id="detail-${item.id}">${seasonsDetailHTML}</div>`
     : `<div class="card-subtitle" style="margin-top:0.5rem">Aucune saison renseignée</div>`}
@@ -591,6 +661,13 @@ function toggleSeasons(animeId, toggleEl) {
   toggleEl.classList.toggle('open');
 }
 
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('view-condensed').classList.toggle('active', mode === 'condensed');
+  document.getElementById('view-expanded').classList.toggle('active', mode === 'expanded');
+  renderAll();
+}
+
 function deleteEntry(id) {
   if (!confirm('Supprimer cette entrée ?')) return;
   DB.animes = DB.animes.filter(x => x.id !== id);
@@ -612,6 +689,9 @@ function openModal(id = null) {
     selectModalType(item.type);
     if (item.type === 'anime') {
       document.getElementById('m-title').value = item.title;
+      // Nettoyer la liste des saisons avant de remplir pour éviter les doublons
+      document.getElementById('seasons-list').innerHTML = '';
+      seasonFields = [];
       item.seasons.forEach(se => addSeasonField(se));
     } else {
       document.getElementById('m-manga-title').value = item.title;
@@ -762,6 +842,7 @@ window.toggleSeasons = toggleSeasons;
 window.saveEntry = saveEntry;
 window.addSeasonField = addSeasonField;
 window.removeSeasonField = removeSF;
+window.setViewMode = setViewMode;
 
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
@@ -780,6 +861,14 @@ async function initApp() {
   updateSyncIndicator();
   
   loadDatabase();
+  
+  // Synchronisation automatique toutes les 30 secondes
+  setInterval(async () => {
+    if (useSupabase && supabaseClient && DB.animes.length + DB.mangas.length > 0) {
+      console.log('🔄 Synchronisation automatique...');
+      await syncToSupabase();
+    }
+  }, 30000);
 }
 
 // ===== INIT =====

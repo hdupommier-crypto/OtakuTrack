@@ -22,6 +22,7 @@
     --text-dim: #8888aa;
     --manga: #9b5de5;
     --anime: #e63946;
+    --view-mode: 'condensed';
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -196,6 +197,34 @@
     gap: 1rem;
   }
 
+  /* View mode toggle */
+  .view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .view-toggle-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .view-toggle-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .view-toggle-btn:hover:not(.active) {
+    border-color: var(--text-dim);
+    color: var(--text);
+  }
+
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -214,6 +243,40 @@
     opacity: 0.6;
   }
   .card:hover { border-color: var(--card-color, var(--accent)); transform: translateY(-2px); }
+
+  /* Expanded view with poster */
+  .card.expanded {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .card-poster {
+    width: 140px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+  .card.expanded .card-header {
+    margin-bottom: 0.5rem;
+  }
+  .card.expanded .card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card.expanded .progress-wrap {
+    margin-bottom: 0.4rem;
+  }
+  .card.expanded .seasons-toggle {
+    margin-top: 0.5rem;
+  }
+  .card.expanded .card-actions {
+    margin-top: auto;
+    padding-top: 0.6rem;
+  }
 
   .card-header {
     display: flex;
@@ -237,9 +300,23 @@
     white-space: nowrap;
     margin-left: 8px;
   }
-  .badge-fini { background: rgba(45,198,83,0.15); color: var(--green); border: 1px solid rgba(45,198,83,0.3); }
-  .badge-en-cours { background: rgba(244,162,97,0.15); color: var(--accent2); border: 1px solid rgba(244,162,97,0.3); }
-  .badge-pas-commence { background: rgba(136,136,170,0.1); color: var(--text-dim); border: 1px solid var(--border); }
+  .badge-fini { 
+    background: linear-gradient(135deg, rgba(45,198,83,0.2), rgba(45,198,83,0.1)); 
+    color: var(--green); 
+    border: 1px solid rgba(45,198,83,0.4);
+    box-shadow: 0 0 10px rgba(45,198,83,0.2);
+  }
+  .badge-en-cours { 
+    background: linear-gradient(135deg, rgba(244,162,97,0.2), rgba(244,162,97,0.1)); 
+    color: var(--accent2); 
+    border: 1px solid rgba(244,162,97,0.4);
+    box-shadow: 0 0 10px rgba(244,162,97,0.2);
+  }
+  .badge-pas-commence { 
+    background: linear-gradient(135deg, rgba(136,136,170,0.15), rgba(136,136,170,0.05)); 
+    color: var(--text-dim); 
+    border: 1px solid var(--border);
+  }
 
   .card-subtitle {
     font-size: 0.75rem;
@@ -547,6 +624,10 @@
     <button class="filter-btn" onclick="setFilter('fini')" id="filter-fini">✓ Finis</button>
     <button class="filter-btn" onclick="setFilter('en-cours')" id="filter-en-cours">⟳ En cours</button>
     <button class="filter-btn" onclick="setFilter('pas-commence')" id="filter-pas-commence">○ À voir</button>
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" onclick="setViewMode('condensed')" id="view-condensed">Condensé</button>
+      <button class="view-toggle-btn" onclick="setViewMode('expanded')" id="view-expanded">Déployé</button>
+    </div>
     <button class="btn-add" onclick="openModal()">+ Ajouter</button>
   </div>
 
