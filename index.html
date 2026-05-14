@@ -193,8 +193,25 @@
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 1rem;
+  }
+
+  /* Mode déployé avec poster - réduire à 3 cartes par ligne maximum */
+  .grid.expanded-view {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (max-width: 1400px) {
+    .grid.expanded-view {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .grid.expanded-view {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* View mode toggle */
